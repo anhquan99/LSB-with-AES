@@ -36,7 +36,10 @@ namespace Utility
         public MessageHandler(string message)
         {
             this.message = message;
+            // ASCII should not be used cause 128 bit not enough for all symbol
+            // UTF16 take more work to do
             this.byteMessage = Encoding.UTF8.GetBytes(this.message);
+            this.byteMessage = addEOFByte();
             setDefault();
             calculateBits();
         }
@@ -52,19 +55,13 @@ namespace Utility
             this.zeroBit = 0;
             this.toltalBits = 0;
         }
-        public byte[] getBytes()
-        {
-            // ASCII should not be used cause 128 bit not enough for all symbol
-            // UTF16 take more work to do
-            return byteMessage;
-        }
         private void calculateBits()
         {
             int result = 0;
-            foreach (var i in getBytes())
+            foreach (var i in byteMessage)
             {
-                result += converToBits(i).Length;
-                foreach (var k in converToBits(i))
+                result += converBytesToBits(i).Length;
+                foreach (var k in converBytesToBits(i))
                 {
                     if (k == '1')
                     {
@@ -75,13 +72,32 @@ namespace Utility
             }
             this.toltalBits = result;
         }
-        public string convertByteToString()
-        {
-            return Encoding.UTF8.GetString(this.byteMessage);
-        }
-        private string converToBits(byte data)
+        private string converBytesToBits(byte data)
         {
             return Convert.ToString(data, 2);
+        }
+        public void reverseStringBits()
+        {
+            for (int i = 0; i < byteMessage.Length; i++)
+            {
+                string temp = "";
+                foreach (var k in converBytesToBits(byteMessage[i]))
+                {
+                    if (k == '1')
+                    {
+                        temp += "0";
+                    }
+                    else temp += "1";
+                }
+                byteMessage[i] = Convert.ToByte(temp, 2);
+            }
+        }
+        private byte[] addEOFByte()
+        {
+            List<Byte> temp = Encoding.UTF8.GetBytes(this.message).ToList();
+            byte eof = 26;
+            temp.Add(eof);
+            return temp.ToArray();
         }
     }
 }

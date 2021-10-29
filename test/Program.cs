@@ -10,14 +10,16 @@ namespace test
     {
         static void Main(string[] args)
         {
-            ImageHandler handler = new ImageHandler(args[0]);
-            handler.numberOfBitNeedToReplace = handler.image.Width * handler.image.Height;
-            Console.WriteLine(handler.lastOneBit);
-            Console.WriteLine(handler.lastZeroBit);
-            Console.WriteLine(handler.lastOneBit);
-            Console.WriteLine(handler.LSBBit);
-            Console.WriteLine(handler.numberOfBitNeedToReplace);
-            //Console.OutputEncoding = Encoding.UTF8;
+            Console.OutputEncoding = Encoding.UTF8;
+
+            Console.WriteLine(LSB.watermark("E:\\Work\\PTIT\\ATPM\\FinalATPM\\test\\temp.jpg", "Do Anh Quan"));
+            //ImageHandler handler = new ImageHandler(args[0], message.toltalBits);
+            //Console.WriteLine(handler.lastOneBit);
+            //Console.WriteLine(handler.lastZeroBit);
+            //Console.WriteLine(handler.lastOneBit);
+            //Console.WriteLine(handler.LSBBit);
+            //Console.WriteLine(handler.numberOfBitNeedToReplace);
+
             //MessageHandler stringHandler = new MessageHandler("QUân");
             //foreach (var i in stringHandler.getBytes())
             //{
