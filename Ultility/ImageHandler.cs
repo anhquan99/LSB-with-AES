@@ -30,13 +30,16 @@ namespace Utility
                 countLastPixelBit();
             }
         }
-        public void makeImage(string[] strByteMessage, string extension, bool flag)
+        public ImageHandler(string path)
+        {
+            this.image = new Bitmap(path);
+        }
+        public void makeImageLSB(string[] strByteMessage, string extension, string flag)
         {
             Bitmap watermarkedImage = new Bitmap(this.image.Width, this.image.Height);
             int messageByteIndex = 0;
             int charByteIndex = 0;
             string currentStringByte = strByteMessage[0];
-            string strFlag = flag ? "0" : "1";
             for (int i = 0; i < image.Height; i++)
             {
                 for (int j = 0; j < image.Width; j++)
@@ -61,7 +64,7 @@ namespace Utility
                                     // put flag
                                     if (i == 0 && j == 0)
                                     {
-                                        subBit[0] = subLastByte(0, byteRed, strFlag);
+                                        subBit[0] = subLastByte(0, byteRed, flag);
                                     }
                                     else
                                     {
@@ -79,7 +82,7 @@ namespace Utility
                                     subBit[2] = subLastByte(charByteIndex, byteBlue, currentStringByte);
                                     break;
                             }
-                            if (i != 0 && j != 0)
+                            if (i != 0 || j != 0 || k != 0)
                             {
                                 charByteIndex++;
                             }
@@ -97,7 +100,7 @@ namespace Utility
             {
                 //case "jpeg"
             }
-            image.Save("result-image.jpeg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            watermarkedImage.Save("result-image.png", System.Drawing.Imaging.ImageFormat.Png);
         }
         private void countLastPixelBit()
         {

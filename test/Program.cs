@@ -12,7 +12,10 @@ namespace test
         {
             Console.OutputEncoding = Encoding.UTF8;
 
-            Console.WriteLine(LSB.watermark("E:\\Work\\PTIT\\ATPM\\FinalATPM\\test\\temp.jpg", "Do Anh Quan"));
+            Console.WriteLine(LSB.watermark("E:\\Work\\PTIT\\ATPM\\FinalATPM\\test\\apple.jpg", "Đỗ Anh Quân"));
+            Console.WriteLine(LSB.extract("E:\\Work\\PTIT\\ATPM\\FinalATPM\\test\\result-image.png"));
+            //Bitmap temp = new Bitmap("E:\\Work\\PTIT\\ATPM\\FinalATPM\\test\\result-image.png");
+            //Color tempC = temp.GetPixel(0, 0);
             //byte eof = 26;
 
             //byte[] eof2 = new byte[] { Convert.ToByte("11111111", 2) };
