@@ -30,19 +30,19 @@ namespace Utility
                 countLastPixelBit();
             }
         }
-        public void makeImage(byte[] messageByte, string extension, bool flag)
+        public void makeImage(string[] strByteMessage, string extension, bool flag)
         {
             Bitmap watermarkedImage = new Bitmap(this.image.Width, this.image.Height);
             int messageByteIndex = 0;
             int charByteIndex = 0;
-            string currentStringByte = Convert.ToString(messageByte[messageByteIndex], 2);
+            string currentStringByte = strByteMessage[0];
             string strFlag = flag ? "0" : "1";
             for (int i = 0; i < image.Height; i++)
             {
                 for (int j = 0; j < image.Width; j++)
                 {
                     Color originPixel = this.image.GetPixel(j, i);
-                    if (messageByteIndex < messageByte.Length - 1)
+                    if (messageByteIndex < strByteMessage.Length - 1)
                     {
                         string[] subBit = new string[3];
                         for (int k = 0; k < 3; k++)
@@ -51,7 +51,7 @@ namespace Utility
                             {
                                 charByteIndex = 0;
                                 messageByteIndex++;
-                                currentStringByte = Convert.ToString(messageByte[messageByteIndex], 2);
+                                currentStringByte = strByteMessage[messageByteIndex];
                             }
                             switch (k)
                             {

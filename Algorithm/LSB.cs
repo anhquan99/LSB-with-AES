@@ -23,7 +23,7 @@ namespace Algorithm
                 messageHandler.reverseStringBits();
                 Console.WriteLine("Reverse");
             }
-            imageHandler.makeImage(messageHandler.byteMessage, "jpeg", flag);
+            imageHandler.makeImage(messageHandler.strByteMessage, "jpeg", flag);
             return "Success";
 
         }

@@ -13,21 +13,19 @@ namespace test
             Console.OutputEncoding = Encoding.UTF8;
 
             Console.WriteLine(LSB.watermark("E:\\Work\\PTIT\\ATPM\\FinalATPM\\test\\temp.jpg", "Do Anh Quan"));
-            //ImageHandler handler = new ImageHandler(args[0], message.toltalBits);
-            //Console.WriteLine(handler.lastOneBit);
-            //Console.WriteLine(handler.lastZeroBit);
-            //Console.WriteLine(handler.lastOneBit);
-            //Console.WriteLine(handler.LSBBit);
-            //Console.WriteLine(handler.numberOfBitNeedToReplace);
+            //byte eof = 26;
 
-            //MessageHandler stringHandler = new MessageHandler("QUân");
-            //foreach (var i in stringHandler.getBytes())
+            //byte[] eof2 = new byte[] { Convert.ToByte("11111111", 2) };
+            //foreach (var i in eof2)
             //{
             //    Console.WriteLine(Convert.ToString(i, 2));
+            //    Console.WriteLine(i);
             //}
-            //Console.WriteLine(stringHandler.toltalBits);
-            //Console.WriteLine(stringHandler.oneBit);
-            //Console.WriteLine(stringHandler.zeroBit);
+            //Console.WriteLine(Encoding.UTF8.GetString(eof2));
+            //string strEof = Convert.ToString(eof2, 2);
+            //Console.WriteLine(eof2);
+            //Console.WriteLine(strEof);
+
         }
     }
 }
