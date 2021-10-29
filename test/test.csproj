@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Algorithm\Algorithm.csproj" />
-    <ProjectReference Include="..\Ultility\Ultility.csproj" />
+    <ProjectReference Include="..\Ultility\Utility.csproj" />
   </ItemGroup>
 
 </Project>

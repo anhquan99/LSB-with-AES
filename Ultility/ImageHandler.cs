@@ -3,31 +3,76 @@ using System.Text;
 using System.Collections;
 using System.Drawing;
 
-namespace Ultility
+namespace Utility
 {
     public class ImageHandler
     {
-        public void readImage(string path)
+        public Bitmap image
         {
-            Bitmap img = new Bitmap(path);
-            //int[][] result = new int[img.Width][img.Height];
-            for (int i = 0; i < 1; i++)
+            get;
+            private set;
+        }
+        public int lastZeroBit { get; private set; }
+        public int lastOneBit { get; private set; }
+        public int numberOfBitNeedToReplace { get; set; } = 0;
+        public int LSBBit
+        {
+            get;
+            private set;
+        }
+        public ImageHandler(string path)
+        {
+            this.image = new Bitmap(path);
+            this.LSBBit = image.Width * image.Height * 3;
+            countLastPixelBit();
+        }
+        public void makeImage(Bitmap image, string name, string extension, bool flag)
+        {
+            if (flag)
             {
-                for (int j = 0; j < 1; j++)
+
+            }
+            else
+            {
+
+            }
+            switch (extension)
+            {
+                //case "jpeg"
+            }
+            //image.Save("NewImage.jpeg", System.Drawing.Imaging.ImageFormat.Jpeg);
+        }
+        private void countLastPixelBit()
+        {
+            for (int i = 0; i < image.Height; i++)
+            {
+                for (int j = 0; j < image.Width; j++)
                 {
-                    Color temp = img.GetPixel(j, i);
-                    Console.WriteLine(temp.R);
-                    Console.WriteLine(Convert.ToString(temp.R, 2));
+                    Color temp = image.GetPixel(j, i);
+                    string red = Convert.ToString(temp.R, 2);
+                    if (red[red.Length - 1] == '1')
+                    {
+                        this.lastOneBit++;
+                    }
+                    else this.lastZeroBit++;
+                    string green = Convert.ToString(temp.G, 2);
+                    if (green[green.Length - 1] == '1')
+                    {
+                        this.lastOneBit++;
+                    }
+                    else this.lastZeroBit++;
+                    string blue = Convert.ToString(temp.B, 2);
+                    if (blue[blue.Length - 1] == '1')
+                    {
+                        this.lastOneBit++;
+                    }
+                    else this.lastZeroBit++;
                 }
             }
         }
-        public void readString(string message)
+        public static int getGrayPixel(int red, int blue, int green)
         {
-            byte[] bytes = Encoding.ASCII.GetBytes(message);
-            foreach (var i in bytes)
-            {
-                Console.WriteLine(i);
-            }
+            return (red + blue + green) / 3;
         }
     }
 }
