@@ -45,12 +45,12 @@ namespace Utility
                 for (int j = 0; j < image.Width; j++)
                 {
                     Color originPixel = this.image.GetPixel(j, i);
-                    if (messageByteIndex < strByteMessage.Length - 1)
+                    if (messageByteIndex < strByteMessage.Length)
                     {
                         string[] subBit = new string[3];
                         for (int k = 0; k < 3; k++)
                         {
-                            if (charByteIndex > currentStringByte.Length - 1)
+                            if (charByteIndex > currentStringByte.Length - 1  && messageByteIndex != strByteMessage.Length - 1)
                             {
                                 charByteIndex = 0;
                                 messageByteIndex++;
@@ -66,20 +66,38 @@ namespace Utility
                                     {
                                         subBit[0] = subLastByte(0, byteRed, flag);
                                     }
-                                    else
+                                    else if(messageByteIndex != strByteMessage.Length - 1 || charByteIndex < currentStringByte.Length)
                                     {
                                         subBit[0] = subLastByte(charByteIndex, byteRed, currentStringByte);
+                                    }
+                                    else
+                                    {
+                                        subBit[0] = byteRed;
                                     }
                                     break;
                                 //green
                                 case 1:
                                     string byteGreen = Convert.ToString(originPixel.G, 2);
-                                    subBit[1] = subLastByte(charByteIndex, byteGreen, currentStringByte);
+                                    if(messageByteIndex != strByteMessage.Length - 1 || charByteIndex < currentStringByte.Length)
+                                    {
+                                        subBit[1] = subLastByte(charByteIndex, byteGreen, currentStringByte);
+                                    }
+                                    else
+                                    {
+                                        subBit[1] = byteGreen;
+                                    }
                                     break;
                                 //blue
                                 case 2:
                                     string byteBlue = Convert.ToString(originPixel.B, 2);
-                                    subBit[2] = subLastByte(charByteIndex, byteBlue, currentStringByte);
+                                    if(messageByteIndex != strByteMessage.Length - 1 || charByteIndex < currentStringByte.Length)
+                                    {
+                                        subBit[2] = subLastByte(charByteIndex, byteBlue, currentStringByte);
+                                    }
+                                    else
+                                    {
+                                        subBit[2] = byteBlue;
+                                    }
                                     break;
                             }
                             if (i != 0 || j != 0 || k != 0)
@@ -89,6 +107,10 @@ namespace Utility
                         }
                         Color tempPixel = Color.FromArgb(Convert.ToByte(subBit[0], 2), Convert.ToByte(subBit[1], 2), Convert.ToByte(subBit[2], 2));
                         watermarkedImage.SetPixel(j, i, tempPixel);
+                        if (messageByteIndex == strByteMessage.Length - 1 && charByteIndex > currentStringByte.Length)
+                        {
+                            messageByteIndex++;
+                        }
                     }
                     else
                     {

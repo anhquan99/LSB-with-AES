@@ -13,6 +13,7 @@ namespace Algorithm
         {
             MessageHandler messageHandler = new MessageHandler(message);
             ImageHandler imageHandler = new ImageHandler(path, messageHandler.toltalBits);
+
             if (messageHandler.toltalBits > imageHandler.LSBBit) return "Image too small to watermark!!!";
             string flag = "1";
             if ((messageHandler.zeroBit > messageHandler.oneBit && imageHandler.lastZeroBit > imageHandler.lastOneBit)
@@ -47,7 +48,10 @@ namespace Algorithm
                         if (eofIndex == 8)
                         {
                             byte temp = Convert.ToByte(new string(checkEOF), 2);
-                            if (temp == 26) break;
+                            if (temp == 26)
+                            {
+                                break;
+                            }
                             result.Add(new string(checkEOF));
                             eofIndex = 0;
                         }
@@ -82,16 +86,22 @@ namespace Algorithm
                             eofIndex++;
                         }
                     }
+                    if (Convert.ToByte(new string(checkEOF), 2) == 26)
+                    {
+                        break;
+                    }
                 }
-                if (Convert.ToByte(new string(checkEOF), 2) == 26 || eofIndex == 8) break;
+                if (Convert.ToByte(new string(checkEOF), 2) == 26)
+                {
+                    break;
+                }
             }
-            string[] resultArr = result.ToArray();
             if (flag == '1')
             {
-                for (int i = 0; i < resultArr.Length; i++)
+                for (int i = 0; i < result.Count; i++)
                 {
                     string temp = "";
-                    foreach (var k in resultArr[i])
+                    foreach (var k in result[i])
                     {
                         if (k == '1')
                         {
@@ -99,15 +109,15 @@ namespace Algorithm
                         }
                         else temp += "1";
                     }
-                    resultArr[i] = temp;
+                    result[i] = temp;
                 }
             }
-            for (int i = 0; i < resultArr.Length; i++)
+            byte[] resultByte = new byte[result.Count];
+            for (int i = 0; i < resultByte.Length; i++)
             {
-                byte[] tempByte = new byte[] { Convert.ToByte(resultArr[i], 2) };
-                resultArr[i] = Encoding.UTF8.GetString(tempByte);
+                resultByte[i] = Convert.ToByte(result[i], 2);
             }
-            return String.Concat(resultArr);
+            return Encoding.UTF8.GetString(resultByte);
         }
     }
 }

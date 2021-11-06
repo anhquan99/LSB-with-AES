@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinalATPM", "FinalATPM\FinalATPM.csproj", "{BD41E04C-F44C-4238-BF16-748FFADA7C0F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algorithm", "Algorithm\Algorithm.csproj", "{1FB35442-A8E5-4FE2-A102-690B3AF8E3A5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test", "test\test.csproj", "{83C12891-1B4A-4B6D-8F1B-960E1C373247}"
@@ -19,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BD41E04C-F44C-4238-BF16-748FFADA7C0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BD41E04C-F44C-4238-BF16-748FFADA7C0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BD41E04C-F44C-4238-BF16-748FFADA7C0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BD41E04C-F44C-4238-BF16-748FFADA7C0F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1FB35442-A8E5-4FE2-A102-690B3AF8E3A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1FB35442-A8E5-4FE2-A102-690B3AF8E3A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FB35442-A8E5-4FE2-A102-690B3AF8E3A5}.Release|Any CPU.ActiveCfg = Release|Any CPU

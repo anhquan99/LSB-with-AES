@@ -17,9 +17,9 @@ namespace Utility
         public ByteHandler(byte[] byteMessage)
         {
             this.byteMessage = byteMessage;
-            addEOFByte();
+            this.byteMessage = addEOFByte();
         }
-        private string converBytesToBits(byte data)
+        private string converBytesToBit(byte data)
         {
             return Convert.ToString(data, 2);
         }
@@ -35,13 +35,18 @@ namespace Utility
             string[] result = new string[byteMessage.Length];
             for (int i = 0; i < this.byteMessage.Length; i++)
             {
-                string temp = converBytesToBits(byteMessage[i]);
+                string temp = converBytesToBit(byteMessage[i]);
                 if (temp.Length < 8)
                 {
+                    string newstr = new string('0', 3);
                     temp = new string('0', 8 - temp.Length) + temp;
                 }
                 result[i] = temp;
             }
+            //foreach(var i in result)
+            //{
+            //    Console.WriteLine(i);
+            //}
             return result;
         }
     }
