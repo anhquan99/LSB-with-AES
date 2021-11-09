@@ -424,7 +424,7 @@ namespace Algorithm
             }
             return result.ToArray();
         }
-        public string encrypt(string message, string key, int keySize)
+        public byte[] encrypt(string message, string key, int keySize)
         {
             if (keySize != 128 && keySize != 192 && keySize != 256) throw new InvalidKeySizeException();
             int i;
@@ -432,9 +432,9 @@ namespace Algorithm
             Nk = Nr / 32;
             Nr = Nk + 6;
             int index = 0;
-            byte[] strKey = Encoding.UTF32.GetBytes(key);
+            byte[] strKey = Encoding.UTF8.GetBytes(key);
             strKey = fillShortString(Nk * 4, strKey);
-            byte[] messageByte = Encoding.UTF32.GetBytes(message);
+            byte[] messageByte = Encoding.UTF8.GetBytes(message);
             if (message.Length % 16 != 0)
             {
                 messageByte = fillShortString(((messageByte.Length / 16 + 1) * 16), messageByte);
@@ -460,9 +460,9 @@ namespace Algorithm
                 }
 
             }
-            return Encoding.UTF32.GetString(encrypted.ToArray());
+            return encrypted.ToArray();
         }
-        public string decrypt(string cipherText, string key, int keySize)
+        public string decrypt(byte[] cipherText, string key, int keySize)
         {
             if (keySize != 128 && keySize != 192 && keySize != 256) throw new InvalidKeySizeException();
             int i;
@@ -470,21 +470,20 @@ namespace Algorithm
             Nk = Nr / 32;
             Nr = Nk + 6;
             int index = 0;
-            byte[] strKey = Encoding.UTF32.GetBytes(key);
+            byte[] strKey = Encoding.UTF8.GetBytes(key);
             strKey = fillShortString(Nk * 4, strKey);
-            byte[] cipherTextByte = Encoding.UTF32.GetBytes(cipherText);
             List<byte> decrypted = new List<byte>();
             for (i = 0; i < Nk * 4; i++)
             {
                 Key[i] = strKey[i];
             }
             KeyExpansion();
-            while (index < cipherTextByte.Length - 1)
+            while (index < cipherText.Length)
             {
 
                 for (i = 0; i < 16; i++)
                 {
-                    inAES[i] = cipherTextByte[index];
+                    inAES[i] = cipherText[index];
                     index++;
                 }
 
@@ -495,7 +494,7 @@ namespace Algorithm
                 }
 
             }
-            return Encoding.UTF32.GetString(decrypted.ToArray());
+            return Encoding.UTF8.GetString(decrypted.ToArray());
         }
         public AES()
         {
@@ -515,7 +514,7 @@ namespace Algorithm
             byte[] strKey = Encoding.UTF8.GetBytes("Passwo");
             strKey = fillShortString(Nk * 4, strKey);
             byte[] temp = strKey;
-            byte[] message = Encoding.UTF8.GetBytes("VIQR (viết tắt của tiếng Anh Vietnamese Quoted-Readable), còn gọi là Vietnet là một quy ước để viết chữ tiếng Việt dùng bảng mã ASCII 7 bit. Vì tính tiện lợi của nó, quy ước này được sử dụng phổ biến trên Internet, nhất là khi bảng mã Unicode chưa được áp dụng rộng rãi.  ");
+            byte[] message = Encoding.UTF8.GetBytes("VIQR (viết tắt của tiếng Anh Vietnamese Quoted-Readable), còn gọi là Vietnet là một quy ước để viết chữ tiếng Việt dùng bảng mã UTF8 7 bit. Vì tính tiện lợi của nó, quy ước này được sử dụng phổ biến trên Internet, nhất là khi bảng mã UTF8 chưa được áp dụng rộng rãi.  ");
             byte[] temp2;
             if (message.Length % 16 != 0)
             {
