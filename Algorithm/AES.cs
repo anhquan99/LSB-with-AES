@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +11,9 @@ namespace Algorithm
     {
         static int Nb = 4;
         int Nr = 0, Nk = 0;
-        byte[] inAES = new byte[16]; byte[] outAES = new byte[16]; byte[,] state = new byte[4,4];
-        byte[] RoundKey = new byte[240];
-        byte[] Key = new byte[32];
+        byte[] inAES; byte[] outAES; byte[,] state;
+        byte[] RoundKey;
+        byte[] Key;
         int getSBoxValue(int num)
         {
             int[] sbox = new int[256]{
@@ -184,6 +185,8 @@ namespace Algorithm
                 RoundKey[i * 4 + 2] = Key[i * 4 + 2];
                 RoundKey[i * 4 + 3] = Key[i * 4 + 3];
             }
+            // nb * nr + 1 = 20 voi 128 bit
+            // i = 4
             while (i < (Nb * (Nr + 1)))
             {
                 for (j = 0; j < 4; j++)
@@ -412,45 +415,154 @@ namespace Algorithm
                 }
             }
         }
+        private byte[] fillShortString(int length, byte[] input)
+        {
+            List<byte> result = input.ToList();
+            for( int i = 0; i < length - input.Length; i++)
+            {
+                result.Add(32);
+            }
+            return result.ToArray();
+        }
+        public string encrypt(string message, string key, int keySize)
+        {
+            if (keySize != 128 && keySize != 192 && keySize != 256) throw new InvalidKeySizeException();
+            int i;
+            Nr = keySize;
+            Nk = Nr / 32;
+            Nr = Nk + 6;
+            int index = 0;
+            byte[] strKey = Encoding.UTF32.GetBytes(key);
+            strKey = fillShortString(Nk * 4, strKey);
+            byte[] messageByte = Encoding.UTF32.GetBytes(message);
+            if (message.Length % 16 != 0)
+            {
+                messageByte = fillShortString(((messageByte.Length / 16 + 1) * 16), messageByte);
+            }
+            List<byte> encrypted = new List<byte>();
+            for (i = 0; i < Nk * 4; i++)
+            {
+                Key[i] = strKey[i];
+            }
+            KeyExpansion();
+            while (index < messageByte.Length - 1)
+            {
+
+                for (i = 0; i < 16; i++)
+                {
+                    inAES[i] = messageByte[index];
+                    index++;
+                }
+                Cipher();
+                foreach (var k in outAES)
+                {
+                    encrypted.Add(k);
+                }
+
+            }
+            return Encoding.UTF32.GetString(encrypted.ToArray());
+        }
+        public string decrypt(string cipherText, string key, int keySize)
+        {
+            if (keySize != 128 && keySize != 192 && keySize != 256) throw new InvalidKeySizeException();
+            int i;
+            Nr = keySize;
+            Nk = Nr / 32;
+            Nr = Nk + 6;
+            int index = 0;
+            byte[] strKey = Encoding.UTF32.GetBytes(key);
+            strKey = fillShortString(Nk * 4, strKey);
+            byte[] cipherTextByte = Encoding.UTF32.GetBytes(cipherText);
+            List<byte> decrypted = new List<byte>();
+            for (i = 0; i < Nk * 4; i++)
+            {
+                Key[i] = strKey[i];
+            }
+            KeyExpansion();
+            while (index < cipherTextByte.Length - 1)
+            {
+
+                for (i = 0; i < 16; i++)
+                {
+                    inAES[i] = cipherTextByte[index];
+                    index++;
+                }
+
+                InvCipher();
+                foreach (var k in outAES)
+                {
+                    decrypted.Add(k);
+                }
+
+            }
+            return Encoding.UTF32.GetString(decrypted.ToArray());
+        }
+        public AES()
+        {
+            inAES = new byte[16];
+            outAES = new byte[16];
+            state = new byte[4, 4];
+            RoundKey = new byte[240];
+            Key = new byte[32];
+        }
         public void run()
         {
             int i;
-            Nr = 128;
+            Nr = 256;
             Nk = Nr / 32;
             Nr = Nk + 6;
-            byte[] temp = new byte[]{ 0x00 ,0x01 ,0x02
-                ,0x03 ,0x04 ,0x05 ,0x06 ,0x07 ,0x08 ,0x09
-                ,0x0a ,0x0b ,0x0c ,0x0d ,0x0e ,0x0f };
-            byte[] temp2 = Encoding.UTF8.GetBytes("Do Anh Quan sdjkwjqd wdqwpoidfjdspofjew;fljmef;lewkf;ldkfc;dsflk'jdlk'fj s l'kfjsdlfkjdsfl;kjfwel;kfjdslkfjdslk;fj'l;kdsakjf");
+            int index = 0;
+            byte[] strKey = Encoding.UTF8.GetBytes("Passwo");
+            strKey = fillShortString(Nk * 4, strKey);
+            byte[] temp = strKey;
+            byte[] message = Encoding.UTF8.GetBytes("VIQR (viết tắt của tiếng Anh Vietnamese Quoted-Readable), còn gọi là Vietnet là một quy ước để viết chữ tiếng Việt dùng bảng mã ASCII 7 bit. Vì tính tiện lợi của nó, quy ước này được sử dụng phổ biến trên Internet, nhất là khi bảng mã Unicode chưa được áp dụng rộng rãi.  ");
+            byte[] temp2;
+            if (message.Length % 16 != 0)
+            {
+                temp2 = fillShortString(((message.Length / 16 + 1) * 16), message);
+            }
+            else
+            {
+                temp2 = message;
+            }
+            List<byte> encryted = new List<byte>();
+            List<byte> decryted = new List<byte>();
             for (i = 0; i < Nk * 4; i++)
             {
                 Key[i] = temp[i];
-                inAES[i] = temp2[i];
             }
             KeyExpansion();
-            Cipher();
-            Console.WriteLine("\nText after encryption:\n");
-            String tempStr = Encoding.UTF8.GetString(outAES);
-            for (i = 0; i < Nk * 4; i++)
+            while (index < temp2.Length)
             {
-                Console.WriteLine("{0}", inAES[i]);
-            }
-            Console.WriteLine(tempStr);
+                for (i = 0; i < 16; i++)
+                {
+                    inAES[i] = temp2[index];
+                    index++;
+                }
+                Cipher();
+                foreach(var k in outAES)
+                {
+                    encryted.Add(k);
+                }
 
-            for (i = 0; i < Nk * 4; i++)
-            {
-                Key[i] = temp[i]; 
-                inAES [i] = outAES[i];
             }
-            KeyExpansion();
-            InvCipher();
-            Console.WriteLine("\nText after decryption:\n");
-            tempStr = Encoding.UTF8.GetString(outAES);
-            for (i = 0; i < Nb * 4; i++)
+            Console.WriteLine(Encoding.UTF8.GetString(encryted.ToArray()));
+            index = 0;
+            while (index < message.Length)
             {
-                Console.WriteLine(outAES[i]);
+                for (i = 0; i < 16; i++)
+                {
+                    inAES[i] = encryted[index];
+                    index++;
+                }
+
+                InvCipher();
+                foreach (var k in outAES)
+                {
+                    decryted.Add(k);
+                }
             }
-            Console.WriteLine(tempStr);
+            Console.WriteLine(Encoding.UTF8.GetString(decryted.ToArray()));
         }
     }
 }
