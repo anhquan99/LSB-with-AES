@@ -13,9 +13,10 @@ namespace test
         {
             Console.OutputEncoding = Encoding.UTF8;
 
-            //Console.WriteLine(LSB.watermark("E:\\Work\\PTIT\\ATPM\\FinalATPM\\test\\apple.jpg", "Đỗ Anh Quân"));
-            Console.WriteLine(LSB.extract("E:\\Work\\PTIT\\ATPM\\FinalATPM\\test\\result-image.png"));
-
+            ////Console.WriteLine(LSB.watermark("E:\\Work\\PTIT\\ATPM\\FinalATPM\\test\\apple.jpg", "Đỗ Anh Quân"));
+            //Console.WriteLine(LSB.extract("E:\\Work\\PTIT\\ATPM\\FinalATPM\\test\\result-image.png"));
+            Algorithm.AES aes = new AES();
+            aes.run();
         }
     }
 }
