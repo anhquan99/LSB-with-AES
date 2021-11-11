@@ -38,13 +38,9 @@ namespace Utility
             private set;
         }
 
-        public MessageHandler(string message)
+        public MessageHandler(byte[] messageByte)
         {
-            this.message = message;
-            // ASCII should not be used cause 128 bit not enough for all symbol
-            // UTF16 take more work to do
-            // UTF8 with max byte is 255
-            ByteHandler byteHandler = new ByteHandler(Encoding.UTF8.GetBytes(this.message));
+            ByteHandler byteHandler = new ByteHandler(messageByte);
             this.strByteMessage = byteHandler.parseBytesToString();
             setDefault();
             calculateBits();
@@ -67,6 +63,7 @@ namespace Utility
                         this.oneBit++;
                     }
                     else this.zeroBit++;
+                    result++;
                 }
             }
             this.toltalBits = result;

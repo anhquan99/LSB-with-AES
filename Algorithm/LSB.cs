@@ -9,9 +9,9 @@ namespace Algorithm
 {
     public class LSB
     {
-        public static string watermark(string path, string message)
+        public static string watermark(string path, byte[] byteMessage)
         {
-            MessageHandler messageHandler = new MessageHandler(message);
+            MessageHandler messageHandler = new MessageHandler(byteMessage);
             ImageHandler imageHandler = new ImageHandler(path, messageHandler.toltalBits);
 
             if (messageHandler.toltalBits > imageHandler.LSBBit) return "Image too small to watermark!!!";
@@ -30,94 +30,154 @@ namespace Algorithm
             return "Success";
 
         }
-        public static string extract(string path)
+        public static byte[] extract(string path)
         {
             ImageHandler imageHandler = new ImageHandler(path);
             Bitmap image = new Bitmap(path);
             char flag = '0';
-            char[] checkEOF = Enumerable.Repeat('0', 8).ToArray();
-            int eofIndex = 0;
+
             List<string> result = new List<string>();
-            for (int i = 0; i < image.Height; i++)
+            int j = 0;
+            int i = 0;
+            string byteRed;
+            string byteGreen;
+            string byteBlue;
+
+            // get flag 
+            Color pixel = image.GetPixel(j, i);
+            byteRed = Convert.ToString(pixel.R, 2);
+            flag = byteRed[byteRed.Length - 1];
+
+            //get length of length of message
+            char[] messageLength_legthChar = new char[8];
+            byteGreen = Convert.ToString(pixel.G, 2);
+            messageLength_legthChar[0] = getCharWithFlag(flag, byteGreen[byteGreen.Length - 1]);
+            byteBlue = Convert.ToString(pixel.B, 2);
+            messageLength_legthChar[1] = getCharWithFlag(flag, byteBlue[byteBlue.Length - 1]);
+            j++;
+            for(int p = 2; p < 8; p+=3)
             {
-                for (int j = 0; j < image.Width; j++)
+                pixel = image.GetPixel(j, i);
+                byteRed = Convert.ToString(pixel.R, 2);
+                messageLength_legthChar[p] =  getCharWithFlag(flag, byteRed[byteRed.Length - 1]);
+                byteGreen = Convert.ToString(pixel.G, 2);
+                messageLength_legthChar[p + 1] = getCharWithFlag(flag, byteGreen[byteGreen.Length - 1]);
+                byteBlue = Convert.ToString(pixel.B, 2);
+                messageLength_legthChar[p + 2] = getCharWithFlag(flag, byteBlue[byteBlue.Length - 1]);
+                j++;
+                if(j == image.Width)
                 {
-                    Color pixel = image.GetPixel(j, i);
-                    for (int k = 0; k < 3; k++)
+                    j = 0;
+                    i++;
+                }
+            }
+            // get length of message
+            int messageLength_length = Convert.ToInt32(new string(messageLength_legthChar), 2);
+            int messageLengthIndex = 0;
+            char[] messageLengthByte = new char[messageLength_length];
+            int k = 0;
+            while (messageLengthIndex < messageLength_length)
+            {
+                for (; i < image.Height; i++)
+                {
+                    for (; j < image.Width; j++)
                     {
-                        if (eofIndex == 8)
+                        pixel = image.GetPixel(j, i);
+                        if (k == 3) k = 0;
+                        for ( ; k < 3; k++)
                         {
-                            byte temp = Convert.ToByte(new string(checkEOF), 2);
-                            if (temp == 26)
+                            switch (k)
                             {
-                                break;
+                                // red
+                                case 0:
+                                    byteRed = Convert.ToString(pixel.R, 2);
+                                    messageLengthByte[messageLengthIndex] = getCharWithFlag(flag, byteRed[byteRed.Length - 1]);
+                                    break;
+                                //green
+                                case 1:
+                                    byteGreen = Convert.ToString(pixel.G, 2);
+                                    messageLengthByte[messageLengthIndex] = getCharWithFlag(flag, byteRed[byteRed.Length - 1]);
+
+                                    break;
+                                //blue
+                                case 2:
+                                    byteBlue = Convert.ToString(pixel.B, 2);
+                                    messageLengthByte[messageLengthIndex] = getCharWithFlag(flag, byteBlue[byteBlue.Length - 1]);
+                                    break;
                             }
-                            result.Add(new string(checkEOF));
-                            eofIndex = 0;
+                            messageLengthIndex++;
+                        }
+                        if (messageLengthIndex == messageLength_length) break;
+                    }
+                    if (messageLengthIndex == messageLength_length) break;
+                }
+            }
+
+            // get message
+            int messageLength = Convert.ToInt32(new string(messageLengthByte), 2);
+            char[] messageChar = new char[8];
+            int messageIndex = 0;
+            List<byte> messageByte = new List<byte>();
+            int messageCharIndex = 0;
+            int tempCount = 0;
+            if(k == 3)
+            {
+                k = 0;
+                j++;
+            }
+            for (; i < image.Height; i++)
+            {
+                if (j == image.Width) j = 0;
+                for (; j < image.Width; j++)
+                {
+                    pixel = image.GetPixel(j, i);
+                    if (k == 3) k = 0;
+                    for (; k < 3; k++)
+                    {
+                        if (messageCharIndex == 8)
+                        {
+                            byte temp = Convert.ToByte(new string(messageChar), 2);
+                            messageByte.Add(temp);
+                            messageCharIndex = 0;
+                            messageIndex++;
                         }
                         switch (k)
                         {
                             // red
                             case 0:
-                                string byteRed = Convert.ToString(pixel.R, 2);
-                                if (i == 0 && j == 0)
-                                {
-                                    flag = byteRed[byteRed.Length - 1];
-                                }
-                                else
-                                {
-                                    checkEOF[eofIndex] = byteRed[byteRed.Length - 1];
-                                }
+                                byteRed = Convert.ToString(pixel.R, 2);
+                                messageChar[messageCharIndex] = getCharWithFlag(flag, byteRed[byteRed.Length - 1]);
                                 break;
                             //green
                             case 1:
-                                string byteGreen = Convert.ToString(pixel.G, 2);
-                                checkEOF[eofIndex] = byteGreen[byteGreen.Length - 1];
+                                byteGreen = Convert.ToString(pixel.G, 2);
+                                messageChar[messageCharIndex] = getCharWithFlag(flag, byteGreen[byteGreen.Length - 1]);
 
                                 break;
                             //blue
                             case 2:
-                                string byteBlue = Convert.ToString(pixel.B, 2);
-                                checkEOF[eofIndex] = byteBlue[byteBlue.Length - 1];
+                                byteBlue = Convert.ToString(pixel.B, 2);
+                                messageChar[messageCharIndex] = getCharWithFlag(flag, byteBlue[byteBlue.Length - 1]);
                                 break;
                         }
-                        if (i != 0 || j != 0 || k != 0)
-                        {
-                            eofIndex++;
-                        }
+                        messageCharIndex++;
+                        tempCount++;
+                        if (messageIndex == messageLength) break;
                     }
-                    if (Convert.ToByte(new string(checkEOF), 2) == 26)
-                    {
-                        break;
-                    }
+                    if (messageIndex == messageLength) break;
                 }
-                if (Convert.ToByte(new string(checkEOF), 2) == 26)
-                {
-                    break;
-                }
+                if (messageIndex == messageLength) break;
             }
-            if (flag == '1')
+            return messageByte.ToArray();
+        }
+        private static char getCharWithFlag(char flag, char input)
+        {
+            if(flag == '1')
             {
-                for (int i = 0; i < result.Count; i++)
-                {
-                    string temp = "";
-                    foreach (var k in result[i])
-                    {
-                        if (k == '1')
-                        {
-                            temp += "0";
-                        }
-                        else temp += "1";
-                    }
-                    result[i] = temp;
-                }
+                if (input == '1') return '0';
+                return '1';
             }
-            byte[] resultByte = new byte[result.Count];
-            for (int i = 0; i < resultByte.Length; i++)
-            {
-                resultByte[i] = Convert.ToByte(result[i], 2);
-            }
-            return Encoding.UTF8.GetString(resultByte);
+            return input;
         }
     }
 }

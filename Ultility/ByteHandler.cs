@@ -17,37 +17,28 @@ namespace Utility
         public ByteHandler(byte[] byteMessage)
         {
             this.byteMessage = byteMessage;
-            this.byteMessage = addEOFByte();
         }
         private string converBytesToBit(byte data)
         {
             return Convert.ToString(data, 2);
         }
-        private byte[] addEOFByte()
-        {
-            List<Byte> temp = this.byteMessage.ToList();
-            byte eof = 26;
-            temp.Add(eof);
-            return temp.ToArray();
-        }
         public string[] parseBytesToString()
         {
-            string[] result = new string[byteMessage.Length];
+            List<string> result = new List<string>();
+            string byteMessage_length_length = Convert.ToString(this.byteMessage.Length, 2); 
+            result.Add(new string('0', 8 - Convert.ToString(byteMessage_length_length.Length, 2).Length)
+                + Convert.ToString(byteMessage_length_length.Length, 2));
+            result.Add(Convert.ToString(this.byteMessage.Length, 2));
             for (int i = 0; i < this.byteMessage.Length; i++)
             {
                 string temp = converBytesToBit(byteMessage[i]);
                 if (temp.Length < 8)
                 {
-                    string newstr = new string('0', 3);
                     temp = new string('0', 8 - temp.Length) + temp;
                 }
-                result[i] = temp;
+                result.Add(temp);
             }
-            //foreach(var i in result)
-            //{
-            //    Console.WriteLine(i);
-            //}
-            return result;
+            return result.ToArray();
         }
     }
 }

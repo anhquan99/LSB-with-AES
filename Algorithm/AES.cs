@@ -432,6 +432,9 @@ namespace Algorithm
             Nk = Nr / 32;
             Nr = Nk + 6;
             int index = 0;
+            // ASCII should not be used cause 128 bit not enough for all symbol
+            // UTF16 take more work to do
+            // UTF8 with max byte is 255
             byte[] strKey = Encoding.UTF8.GetBytes(key);
             strKey = fillShortString(Nk * 4, strKey);
             byte[] messageByte = Encoding.UTF8.GetBytes(message);
@@ -472,6 +475,10 @@ namespace Algorithm
             int index = 0;
             byte[] strKey = Encoding.UTF8.GetBytes(key);
             strKey = fillShortString(Nk * 4, strKey);
+            if (cipherText.Length % 16 != 0)
+            {
+                cipherText = fillShortString(((cipherText.Length / 16 + 1) * 16), cipherText);
+            }
             List<byte> decrypted = new List<byte>();
             for (i = 0; i < Nk * 4; i++)
             {
