@@ -7,7 +7,7 @@ using Utility;
 
 namespace Algorithm
 {
-    public class LSB
+    public partial class LSB
     {
         public static string watermark(string path, byte[] byteMessage)
         {
