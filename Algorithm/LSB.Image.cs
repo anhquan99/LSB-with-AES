@@ -9,12 +9,12 @@ namespace Algorithm
 {
     public partial class LSB
     {
-        public static string watermark(string path, byte[] byteMessage)
+        public static string watermarkImage(string path, byte[] byteMessage)
         {
             MessageHandler messageHandler = new MessageHandler(byteMessage);
             ImageHandler imageHandler = new ImageHandler(path, messageHandler.toltalBits);
 
-            if (messageHandler.toltalBits > imageHandler.LSBBit) return "Image too small to watermark!!!";
+            if (messageHandler.toltalBits + 1 > imageHandler.LSBBit) return "Image too small to watermark!!!";
             string flag = "1";
             if ((messageHandler.zeroBit > messageHandler.oneBit && imageHandler.lastZeroBit > imageHandler.lastOneBit)
                 || (messageHandler.oneBit > messageHandler.zeroBit && imageHandler.lastOneBit > imageHandler.lastZeroBit))
@@ -30,7 +30,7 @@ namespace Algorithm
             return "Success";
 
         }
-        public static byte[] extract(string path)
+        public static byte[] extractImage(string path)
         {
             ImageHandler imageHandler = new ImageHandler(path);
             Bitmap image = new Bitmap(path);
@@ -119,7 +119,6 @@ namespace Algorithm
             int messageIndex = 0;
             List<byte> messageByte = new List<byte>();
             int messageCharIndex = 0;
-            int tempCount = 0;
             if(k == 3)
             {
                 k = 0;
@@ -161,7 +160,6 @@ namespace Algorithm
                                 break;
                         }
                         messageCharIndex++;
-                        tempCount++;
                         if (messageIndex == messageLength) break;
                     }
                     if (messageIndex == messageLength) break;
