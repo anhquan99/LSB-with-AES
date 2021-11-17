@@ -18,3 +18,6 @@ code {
   grid-gap: 20px;
   align-items: stretch;
 }
+.body{
+  padding-bottom: 3%;
+}
