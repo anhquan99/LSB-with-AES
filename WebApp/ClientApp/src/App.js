@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { Layout } from './components/Layout';
-import { Home } from './components/Home';
-import { FetchData } from './components/FetchData';
+import { ImageEncrypt } from './components/ImageEncrypt';
+import { AudioEncrypt } from './components/AudioEncrypt';
 import { Counter } from './components/Counter';
 
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './custom.css'
 
 export default class App extends Component {
@@ -13,9 +14,9 @@ export default class App extends Component {
   render () {
     return (
       <Layout>
-        <Route exact path='/' component={Home} />
-        <Route path='/counter' component={Counter} />
-        <Route path='/fetch-data' component={FetchData} />
+        <Route exact path='/' component={ImageEncrypt} />
+        <Route path='/counter' component={AudioEncrypt} />
+        {/* <Route path='/fetch-data' component={FetchData} /> */}
       </Layout>
     );
   }

@@ -12,3 +12,9 @@ code {
   background-color: #1b6ec2;
   border-color: #1861ac;
 }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(200px, 1fr));
+  grid-gap: 20px;
+  align-items: stretch;
+}
