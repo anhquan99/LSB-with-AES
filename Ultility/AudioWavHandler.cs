@@ -48,7 +48,7 @@ namespace Utility
             {
 
                 BinaryReader reader = new BinaryReader(memoryStream);
-
+                reader.BaseStream.Position = 0;
                 // chunk 0
                 byte[] readerBytes = reader.ReadBytes(4 * 3);
                 foreach (var i in readerBytes)

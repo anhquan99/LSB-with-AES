@@ -85,6 +85,7 @@ namespace Algorithm
                         if (k == 3) k = 0;
                         for ( ; k < 3; k++)
                         {
+                            if (messageLengthIndex == messageLength_length) break;
                             switch (k)
                             {
                                 // red
