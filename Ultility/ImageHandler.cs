@@ -41,7 +41,7 @@ namespace Utility
                 countLastPixelBit();
             }
         }
-        public void makeImageLSB(string[] strByteMessage, string extension, string flag)
+        public Bitmap makeImageLSB(string[] strByteMessage, string flag)
         {
             Bitmap watermarkedImage = new Bitmap(this.image.Width, this.image.Height);
             int messageByteIndex = 0;
@@ -125,11 +125,7 @@ namespace Utility
                     }
                 }
             }
-            switch (extension)
-            {
-                //case "jpeg"
-            }
-            watermarkedImage.Save("result-image.png", System.Drawing.Imaging.ImageFormat.Png);
+            return watermarkedImage;
         }
         private void countLastPixelBit()
         {

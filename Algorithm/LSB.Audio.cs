@@ -10,11 +10,11 @@ namespace Algorithm
 {
     public partial class LSB
     {
-        public static string watermarkAudio(MemoryStream stream, byte[] byteMessage)
+        public static byte[] watermarkAudio(MemoryStream stream, byte[] byteMessage)
         {
             MessageHandler messageHandler = new MessageHandler(byteMessage);
             AudioWavHandler audioHandler = new AudioWavHandler(stream);
-            if (audioHandler.bitsAvailable + 1 < messageHandler.toltalBits) return "Audio too small to watermark!!!";
+            if (audioHandler.bitsAvailable + 1 < messageHandler.toltalBits) throw new Exception("Audio too small to watermark!!!");
 
             List<byte> data = new List<byte>();
             foreach (var i in audioHandler.header)
@@ -67,13 +67,7 @@ namespace Algorithm
             {
                 data.Add(audioHandler.data[i]);
             }
-            using (FileStream bytesToAudio = File.Create("resultAudio.wav"))
-            {
-                bytesToAudio.Write(data.ToArray(), 0, data.Count);
-                Stream audioFile = bytesToAudio;
-                bytesToAudio.Close();
-            }
-            return "Sucess";
+            return data.ToArray();
         }
         public static byte[] extractAudio(MemoryStream stream)
         {

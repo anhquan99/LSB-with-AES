@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import axios from "axios";
 import {
   Form,
   Label,
@@ -19,50 +18,6 @@ export class Index extends Component {
     key: "",
     result: ""
   };
-  async handleFormSubmit(e) {
-    e.preventDefault();
-    // fetch("api/AES")
-    //   .then((response) => response.json())
-    //   .then((data) => console.log(data));
-
-    var object = {};
-    const formData = new FormData(e.target);
-    formData.forEach(function(value, key) {
-      object[key] = value;
-    });
-    for (var key of formData.entries()) {
-      console.log(key[0] + ", " + key[1]);
-    }
-    axios
-      .post("/api/AES", formData, {
-        headers: { "Content-Type": "application/json" }
-      })
-      .then(response => {
-        console.log(response);
-        const url = window.URL.createObjectURL(new Blob([response]));
-        window.open(url, "_self");
-        // const link = document.createElement("a");
-        // link.href = url;
-        // const fileName = `${+new Date()}.jpg`; // whatever your file name .
-        // link.setAttribute("download", fileName);
-        // document.body.appendChild(link);
-        // link.click();
-        // link.remove(); // you need to remove that elelment which is created before
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
-
-    // postWithFile("/api/Product", formData).then((response) => {
-    //     if (response.status === 200) {
-    //         alert("Success");
-    //         window.location = "/";
-    //     }
-    // }).catch(function (error) {
-    //     console.log("POST Product field");
-    //     return Promise.reject(error);
-    // });
-  }
   isFileImage(file) {
     return file && file["type"].split("/")[0] === "image";
   }
@@ -87,6 +42,16 @@ export class Index extends Component {
       );
     });
   }
+  renderAudio(source, state){
+    return source.map((audio, i) => {
+      return (
+        <audio controls className="full_sizeAudio">
+          <source src={audio} type="audio/ogg"/>
+          <source src={audio} type="audio/mpeg"/>
+        </audio>
+      );
+    });
+  }
   handleImageChange(e, source) {
     if (e.target.files) {
       for (let i = 0; i < e.target.files.length; i++) {
@@ -108,11 +73,25 @@ export class Index extends Component {
       this.setState({ message: "" });
     }
   }
+  handleAudioChange(e, source){
+    const filesArray = Array.from(e.target.files).map(file =>
+      URL.createObjectURL(file)
+    );
+
+    this.setState({ [source]: filesArray });
+    Array.from(e.target.files).map(file => {
+      URL.revokeObjectURL(file);
+    });
+
+    this.setState({ message: "" });
+  }
   render() {
     return (
       <Form
+        action="/api/AES"
         className="body"
-        onSubmit={e => this.handleFormSubmit(e)}
+        method="POST"
+        // onSubmit={e => this.handleFormSubmit(e)}
         encType="multipart/form-data"
       >
         <h1>LSB WITH AES ENCRYPT/DECRYPT</h1>
@@ -123,13 +102,13 @@ export class Index extends Component {
             name="key"
             placeholder="Enter key"
             type="text"
-            required="true"
+            required={true}
           />
         </FormGroup>
 
         <FormGroup>
           <Label for="message">Message</Label>
-          <Input id="message" name="message" type="textarea" required="true" />
+          <Input id="message" name="message" type="textarea"/>
         </FormGroup>
         <FormGroup>
           <Label for="fileType">File type</Label>
@@ -137,7 +116,7 @@ export class Index extends Component {
             id="fileType"
             name="fileType"
             type="select"
-            required="true"
+            required={true}
             onChange={e => {
               this.setState({ fileType: e.target.value });
             }}
@@ -156,9 +135,16 @@ export class Index extends Component {
                 className="custom-file-input"
                 id="file"
                 name="file"
-                accept={this.state.fileType == "Image" ? "image/*" : "audio/*"}
-                onChange={e => this.handleImageChange(e, "file")}
-                required="true"
+                accept={this.state.fileType == "Image" ? "image/*" : ".wav"}
+                onChange={(e) =>{
+                  if(this.state.fileType === "Image"){
+                    this.handleImageChange(e, "file")
+                  }
+                  else{
+                    this.handleAudioChange(e, "file")
+                  }
+                } }
+                required={true}
               />
               <label className="custom-file-label" htmlFor="file">
                 Choose file
@@ -167,7 +153,7 @@ export class Index extends Component {
             <FormText>Audio file support only for .wav file.</FormText>
           </Col>
           <Col>
-            <div>{this.renderPhotos(this.state.file, "file")}</div>
+            {this.state.fileType === "Image" ? <div className="full_size">{this.renderPhotos(this.state.file, "file")}</div> : <div className="full_size">{this.renderAudio(this.state.file, "file")}</div>}
           </Col>
         </Row>
         {/* <FormGroup>
@@ -176,7 +162,7 @@ export class Index extends Component {
         </FormGroup> */}
         <FormGroup>
           <Label for="keySize">Key size (bit)</Label>
-          <Input id="keySize" name="keySize" type="select" required="true">
+          <Input id="keySize" name="keySize" type="select" required={true}>
             <option value="128">128</option>
             <option value="192">192</option>
             <option value="256">256</option>
@@ -184,7 +170,7 @@ export class Index extends Component {
         </FormGroup>
         <FormGroup>
           <Label for="keySize">Action</Label>
-          <Input id="action" name="action" type="select" required="true">
+          <Input id="action" name="action" type="select" required={true}>
             <option value="Encrypt">Encrypt</option>
             <option value="Decrypt">Decrypt</option>
           </Input>

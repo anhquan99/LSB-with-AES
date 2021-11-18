@@ -10,12 +10,12 @@ namespace Algorithm
 {
     public partial class LSB
     {
-        public static string watermarkImage(MemoryStream stream, byte[] byteMessage)
+        public static Bitmap watermarkImage(MemoryStream stream, byte[] byteMessage)
         {
             MessageHandler messageHandler = new MessageHandler(byteMessage);
             ImageHandler imageHandler = new ImageHandler(stream, messageHandler.toltalBits);
 
-            if (messageHandler.toltalBits + 1 > imageHandler.LSBBit) return "Image too small to watermark!!!";
+            if (messageHandler.toltalBits + 1 > imageHandler.LSBBit) throw new Exception("Image too small to watermark!!!");
             string flag = "1";
             if ((messageHandler.zeroBit > messageHandler.oneBit && imageHandler.lastZeroBit > imageHandler.lastOneBit)
                 || (messageHandler.oneBit > messageHandler.zeroBit && imageHandler.lastOneBit > imageHandler.lastZeroBit))
@@ -27,8 +27,7 @@ namespace Algorithm
                 messageHandler.reverseStringBits();
                 Console.WriteLine("Reverse");
             }
-            imageHandler.makeImageLSB(messageHandler.strByteMessage, "jpeg", flag);
-            return "Success";
+            return imageHandler.makeImageLSB(messageHandler.strByteMessage, flag);
 
         }
         public static byte[] extractImage(MemoryStream stream)
