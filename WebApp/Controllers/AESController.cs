@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -20,7 +22,7 @@ namespace WebApp.Controllers
     public class AESController : ControllerBase
     {
 
-         //POST api/<AESController>
+        //POST api/<AESController>
         //[Microsoft.AspNetCore.Mvc.HttpPost]
         //public async IHttpActionResult Post([FromForm] PostFile postFile)
         //{
@@ -63,24 +65,27 @@ namespace WebApp.Controllers
         //    }
         //}
         [HttpPost]
-        public HttpResponseMessage Post([FromForm] PostFile file)
+        public IActionResult Post([FromForm] PostFile file)
         {
-            MemoryStream stream = new MemoryStream();
-            file.file.CopyTo(stream);
-            var result = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new ByteArrayContent(stream.ToArray())
-            };
-            result.Content.Headers.ContentDisposition =
-                new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
-                {
-                    FileName = "CertificationCard.pdf"
-                };
-            result.Content.Headers.ContentType =
-                new MediaTypeHeaderValue("application/octet-stream");
 
-            return result;
-            //return File(stream, "image/jpg", "result.jpg");
+            //MemoryStream stream = new MemoryStream();
+            //file.file.CopyTo(stream);
+            //var content = stream.ToArray();
+            //return File(content, "image/jpg", "result.jpg");
+            Bitmap image = new Bitmap("E:\\Work\\PTIT\\ATPM\\FinalATPM\\test\\apple.jpg");
+            MemoryStream stream = new MemoryStream();
+            image.Save(stream, ImageFormat.Jpeg);
+            var content = stream.ToArray();
+            return File(content, "image/jpg", "result.jpg");
+        }
+        [HttpGet]
+        public IActionResult Get()
+        {
+            Bitmap image = new Bitmap("E:\\Work\\PTIT\\ATPM\\FinalATPM\\test\\apple.jpg");
+            MemoryStream stream = new MemoryStream();
+            image.Save(stream, ImageFormat.Jpeg);
+            var content = stream.ToArray();
+            return File(content, "image/jpg", "result.jpg");
         }
     }
 }
