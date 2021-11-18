@@ -2,6 +2,7 @@
 using System.Text;
 using System.Collections;
 using System.Drawing;
+using System.IO;
 
 namespace Utility
 {
@@ -20,19 +21,25 @@ namespace Utility
             get;
             private set;
         }
-        public ImageHandler(string path, int messageBits)
+        //public ImageHandler(string path, int messageBits)
+        //{
+        //    this.image = new Bitmap(path);
+        //    this.LSBBit = image.Width * image.Height * 3;
+        //    this.numberOfBitNeedToReplace = messageBits;
+        //    if (numberOfBitNeedToReplace < LSBBit)
+        //    {
+        //        countLastPixelBit();
+        //    }
+        //}        
+        public ImageHandler(MemoryStream stream, int messageBits)
         {
-            this.image = new Bitmap(path);
+            this.image = new Bitmap(stream);
             this.LSBBit = image.Width * image.Height * 3;
             this.numberOfBitNeedToReplace = messageBits;
             if (numberOfBitNeedToReplace < LSBBit)
             {
                 countLastPixelBit();
             }
-        }
-        public ImageHandler(string path)
-        {
-            this.image = new Bitmap(path);
         }
         public void makeImageLSB(string[] strByteMessage, string extension, string flag)
         {

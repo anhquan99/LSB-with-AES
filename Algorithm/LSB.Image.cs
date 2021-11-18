@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Utility;
@@ -9,10 +10,10 @@ namespace Algorithm
 {
     public partial class LSB
     {
-        public static string watermarkImage(string path, byte[] byteMessage)
+        public static string watermarkImage(MemoryStream stream, byte[] byteMessage)
         {
             MessageHandler messageHandler = new MessageHandler(byteMessage);
-            ImageHandler imageHandler = new ImageHandler(path, messageHandler.toltalBits);
+            ImageHandler imageHandler = new ImageHandler(stream, messageHandler.toltalBits);
 
             if (messageHandler.toltalBits + 1 > imageHandler.LSBBit) return "Image too small to watermark!!!";
             string flag = "1";
@@ -30,10 +31,9 @@ namespace Algorithm
             return "Success";
 
         }
-        public static byte[] extractImage(string path)
+        public static byte[] extractImage(MemoryStream stream)
         {
-            ImageHandler imageHandler = new ImageHandler(path);
-            Bitmap image = new Bitmap(path);
+            Bitmap image = new Bitmap(stream);
             char flag = '0';
 
             List<string> result = new List<string>();

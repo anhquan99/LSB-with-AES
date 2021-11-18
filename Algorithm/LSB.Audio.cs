@@ -10,10 +10,10 @@ namespace Algorithm
 {
     public partial class LSB
     {
-        public static string watermarkAudio(string path, byte[] byteMessage)
+        public static string watermarkAudio(MemoryStream stream, byte[] byteMessage)
         {
             MessageHandler messageHandler = new MessageHandler(byteMessage);
-            AudioWavHandler audioHandler = new AudioWavHandler(path);
+            AudioWavHandler audioHandler = new AudioWavHandler(stream);
             if (audioHandler.bitsAvailable + 1 < messageHandler.toltalBits) return "Audio too small to watermark!!!";
 
             List<byte> data = new List<byte>();
@@ -75,9 +75,9 @@ namespace Algorithm
             }
             return "Sucess";
         }
-        public static byte[] extractAudio(string path)
+        public static byte[] extractAudio(MemoryStream stream)
         {
-            AudioWavHandler audioHandler = new AudioWavHandler(path);
+            AudioWavHandler audioHandler = new AudioWavHandler(stream);
             int audioIndex = 0;
 
             //get length of length of message

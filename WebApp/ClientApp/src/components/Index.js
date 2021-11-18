@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from "axios";
 import { Form, Label, Input, FormGroup, FormText, Button, Col, Row } from 'reactstrap'
 export class Index extends Component {
   state = {
@@ -6,28 +7,32 @@ export class Index extends Component {
     file: [],
     message: "",
     keySize: "",
-    key: ""
+    key: "",
+    result: ""
   }
   async handleFormSubmit(e) {
     e.preventDefault();
+    // fetch("api/AES")
+    //   .then((response) => response.json())
+    //   .then((data) => console.log(data));
+
     var object = {};
     const formData = new FormData(e.target);
     formData.forEach(function (value, key) {
       object[key] = value;
     });
-    var tempFiles = await Array.from(this.state.file);
     for (var key of formData.entries()) {
       console.log(key[0] + ', ' + key[1])
     }
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: formData
-    };
-    fetch("", requestOptions).then((response) =>{
+    axios.post("/api/AES", formData, {
+      headers: { 'Content-Type': 'application/json' }
+    }).then((response) =>{
+      console.log("response : " + response);
+      // this.setState({result : temp});
+    }).catch(function(error){
+      console.log(error);
+    });
 
-    })
-    
     // postWithFile("/api/Product", formData).then((response) => {
     //     if (response.status === 200) {
     //         alert("Success");
@@ -120,6 +125,9 @@ export class Index extends Component {
             name="fileType"
             type="select"
             required="true"
+            onChange={(e)=>{
+                this.setState({fileType: e.target.value});
+            }}
           >
             <option value="Image">
               Image
