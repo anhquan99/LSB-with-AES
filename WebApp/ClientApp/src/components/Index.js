@@ -16,8 +16,10 @@ export class Index extends Component {
     message: "",
     keySize: "",
     key: "",
-    result: ""
+    result: "",
+    fileName: ""
   };
+  audioRef = React.createRef();
   isFileImage(file) {
     return file && file["type"].split("/")[0] === "image";
   }
@@ -42,17 +44,18 @@ export class Index extends Component {
       );
     });
   }
-  renderAudio(source, state){
-    return source.map((audio, i) => {
+  renderAudio(source, state) {
+    return source.map((audio) => {
       return (
-        <audio controls className="full_sizeAudio">
-          <source src={audio} type="audio/ogg"/>
-          <source src={audio} type="audio/mpeg"/>
+        <audio ref={this.audioRef} controls className="full_sizeAudio">
+          <source src={audio} type="audio/ogg" />
+          <source src={audio} type="audio/mpeg" />
         </audio>
       );
     });
   }
-  handleImageChange(e, source) {
+  async handleImageChange(e, source) {
+    var origin = e.target.files;
     if (e.target.files) {
       for (let i = 0; i < e.target.files.length; i++) {
         if (!this.isFileImage(e.target.files[i])) {
@@ -65,25 +68,22 @@ export class Index extends Component {
         URL.createObjectURL(file)
       );
 
-      this.setState({ [source]: filesArray });
-      Array.from(e.target.files).map(file => {
-        URL.revokeObjectURL(file);
-      });
+      await this.setState({ [source]: filesArray });
+      // Array.from(e.target.files).map(file => {
+      //   URL.revokeObjectURL(file);
+      // });
+      await this.setState({ fileName: origin[0].name });
 
-      this.setState({ message: "" });
     }
   }
-  handleAudioChange(e, source){
+  async handleAudioChange(e, source) {
     const filesArray = Array.from(e.target.files).map(file =>
       URL.createObjectURL(file)
     );
-
-    this.setState({ [source]: filesArray });
-    Array.from(e.target.files).map(file => {
-      URL.revokeObjectURL(file);
-    });
-
-    this.setState({ message: "" });
+    await this.setState({ [source]: filesArray });
+    this.audioRef.current.pause();
+    this.audioRef.current.load();
+    await this.setState({ fileName: filesArray[0].name });
   }
   render() {
     return (
@@ -108,7 +108,7 @@ export class Index extends Component {
 
         <FormGroup>
           <Label for="message">Message</Label>
-          <Input id="message" name="message" type="textarea"/>
+          <Input id="message" name="message" type="textarea" />
         </FormGroup>
         <FormGroup>
           <Label for="fileType">File type</Label>
@@ -136,30 +136,27 @@ export class Index extends Component {
                 id="file"
                 name="file"
                 accept={this.state.fileType == "Image" ? "image/*" : ".wav"}
-                onChange={(e) =>{
-                  if(this.state.fileType === "Image"){
+                onChange={(e) => {
+                  if (this.state.fileType === "Image") {
                     this.handleImageChange(e, "file")
                   }
-                  else{
+                  else {
                     this.handleAudioChange(e, "file")
                   }
-                } }
+                }}
                 required={true}
               />
               <label className="custom-file-label" htmlFor="file">
-                Choose file
+                {this.state.fileName === '' ? "Choose file" : this.state.fileName}
               </label>
             </div>
             <FormText>Audio file support only for .wav file.</FormText>
           </Col>
           <Col>
-            {this.state.fileType === "Image" ? <div className="full_size">{this.renderPhotos(this.state.file, "file")}</div> : <div className="full_size">{this.renderAudio(this.state.file, "file")}</div>}
+            {this.state.fileType === "Image" ? <div className="full_size">{this.renderPhotos(this.state.file, "file")}</div> :
+              <div className="full_size">{this.renderAudio(this.state.file, "file")}</div>}
           </Col>
         </Row>
-        {/* <FormGroup>
-
-
-        </FormGroup> */}
         <FormGroup>
           <Label for="keySize">Key size (bit)</Label>
           <Input id="keySize" name="keySize" type="select" required={true}>

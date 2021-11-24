@@ -3,6 +3,7 @@ using System.Text;
 using System.Collections;
 using System.Drawing;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Utility
 {
@@ -21,6 +22,9 @@ namespace Utility
             get;
             private set;
         }
+        public List<int> redBytes { get; private set; }
+        public List<int> greenBytes { get; private set; }
+        public List<int> blueBytes { get; private set; }
         //public ImageHandler(string path, int messageBits)
         //{
         //    this.image = new Bitmap(path);
@@ -39,6 +43,23 @@ namespace Utility
             if (numberOfBitNeedToReplace < LSBBit)
             {
                 countLastPixelBit();
+            }
+        }
+        public ImageHandler(MemoryStream stream)
+        {
+            this.redBytes = new List<int>();
+            this.greenBytes = new List<int>();
+            this.blueBytes = new List<int>();
+            this.image = new Bitmap(stream);
+            for(int i = 0; i < this.image.Height; i++)
+            {
+                for(int j = 0; j < this.image.Width; j++)
+                {
+                    var pixel = this.image.GetPixel(j, i);
+                    this.redBytes.Add(pixel.R);
+                    this.greenBytes.Add(pixel.G);
+                    this.blueBytes.Add(pixel.B);
+                }
             }
         }
         public Bitmap makeImageLSB(string[] strByteMessage, string flag)

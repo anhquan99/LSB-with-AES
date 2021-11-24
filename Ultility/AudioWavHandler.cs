@@ -20,11 +20,6 @@ namespace Utility
             get;
             private set;
         }
-        public List<byte> test
-        {
-            get;
-            private set;
-        }
         public List<byte> header
         {
             get;
@@ -37,7 +32,6 @@ namespace Utility
         }
         public AudioWavHandler(MemoryStream stream)
         {
-            test = new List<byte>();
             header = new List<byte>();
             data = new List<byte>();
             readWav(stream);

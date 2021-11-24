@@ -27,90 +27,175 @@ namespace WebApp.Controllers
         [HttpPost]
         public IActionResult Post([FromForm] PostFile postFile)
         {
-            switch (postFile.fileType.ToLower())
+            try
             {
-                case "image":
-                    switch (postFile.action.ToLower())
-                    {
-                        case "encrypt":
-                            using (var memoryStream = new MemoryStream())
-                            {
-                                postFile.file.CopyTo(memoryStream);
-                                AES aes = new AES();
-                                byte[] byteMessage = aes.encrypt(postFile.message, postFile.key, postFile.keySize);
-                                Bitmap encryptedImage = LSB.watermarkImage(memoryStream, byteMessage);
-                                string fileFomat = postFile.file.FileName.Split('.')[postFile.file.FileName.Split('.').Length - 1];
-                                MemoryStream saveFile = new MemoryStream();
-                                encryptedImage.Save(saveFile, ImageFormat.Png);
-                                var content = saveFile.ToArray();
-                                return File(content, "image/" + fileFomat, "encrypted_" + postFile.file.FileName.Split('.')[0] + ".png");
-                            }
-                        case "decrypt":
-                            using (var memoryStream = new MemoryStream())
-                            {
-                                postFile.file.CopyTo(memoryStream);
-                                AES aes = new AES();
-                                byte[] byteMessage = LSB.extractImage(memoryStream);
-                                byte[] message = Encoding.UTF8.GetBytes(aes.decrypt(byteMessage, postFile.key, postFile.keySize));
-                                return File(message, "text/plain", "decrypted_" + postFile.file.FileName.Split('.')[0] + ".txt");
-                            }
-                    }
-                    break;
-                case "audio":
-                    switch (postFile.action.ToLower())
-                    {
-                        case "encrypt":
-                            using (var memoryStream = new MemoryStream())
-                            {
-                                postFile.file.CopyTo(memoryStream);
-                                AES aes = new AES();
-                                byte[] byteMessage = aes.encrypt(postFile.message, postFile.key, postFile.keySize);
-                                byte[] encryptedAudio = LSB.watermarkAudio(memoryStream, byteMessage);
-                                //var encryptedStream = new MemoryStream(encryptedAudio);
-                                return File(encryptedAudio, "audio/wav", "encrypted_" + postFile.file.FileName);
+                switch (postFile.fileType.ToLower())
+                {
+                    case "image":
+                        switch (postFile.action.ToLower())
+                        {
+                            case "encrypt":
+                                using (var memoryStream = new MemoryStream())
+                                {
+                                    postFile.file.CopyTo(memoryStream);
+                                    AES aes = new AES();
+                                    byte[] byteMessage = aes.encrypt(postFile.message, postFile.key, postFile.keySize);
+                                    Bitmap encryptedImage = LSB.watermarkImage(memoryStream, byteMessage);
+                                    MemoryStream saveFile = new MemoryStream();
+                                    encryptedImage.Save(saveFile, ImageFormat.Png);
+                                    var content = saveFile.ToArray();
+                                    return File(content, "image/png", "encrypted_" + postFile.file.FileName.Split('.')[0] + ".png");
+                                }
+                            case "decrypt":
+                                using (var memoryStream = new MemoryStream())
+                                {
+                                    postFile.file.CopyTo(memoryStream);
+                                    AES aes = new AES();
+                                    byte[] byteMessage = LSB.extractImage(memoryStream);
+                                    byte[] message = Encoding.UTF8.GetBytes(aes.decrypt(byteMessage, postFile.key, postFile.keySize));
+                                    return File(message, "text/plain", "decrypted_" + postFile.file.FileName.Split('.')[0] + ".txt");
+                                }
+                        }
+                        break;
+                    case "audio":
+                        switch (postFile.action.ToLower())
+                        {
+                            case "encrypt":
+                                using (var memoryStream = new MemoryStream())
+                                {
+                                    postFile.file.CopyTo(memoryStream);
+                                    AES aes = new AES();
+                                    byte[] byteMessage = aes.encrypt(postFile.message, postFile.key, postFile.keySize);
+                                    byte[] encryptedAudio = LSB.watermarkAudio(memoryStream, byteMessage);
+                                    //var encryptedStream = new MemoryStream(encryptedAudio);
+                                    return File(encryptedAudio, "audio/wav", "encrypted_" + postFile.file.FileName);
 
-                            }
-                        case "decrypt":
-                            using (var memoryStream = new MemoryStream())
-                            {
-                                postFile.file.CopyTo(memoryStream);
-                                AES aes = new AES();
-                                byte[] byteMessage = LSB.extractAudio(memoryStream);
-                                byte[] message = Encoding.UTF8.GetBytes(aes.decrypt(byteMessage, postFile.key, postFile.keySize));
-                                return File(message, "text/plain", "decrypted_" + postFile.file.FileName.Split('.')[0] + ".txt");
-                            }
-                    }
-                    break;
-                default:
-                    return BadRequest("File fomat not supported");
+                                }
+                            case "decrypt":
+                                using (var memoryStream = new MemoryStream())
+                                {
+                                    postFile.file.CopyTo(memoryStream);
+                                    AES aes = new AES();
+                                    byte[] byteMessage = LSB.extractAudio(memoryStream);
+                                    byte[] message = Encoding.UTF8.GetBytes(aes.decrypt(byteMessage, postFile.key, postFile.keySize));
+                                    return File(message, "text/plain", "decrypted_" + postFile.file.FileName.Split('.')[0] + ".txt");
+                                }
+                        }
+                        break;
+                    default:
+                        return BadRequest("File format not supported");
+                }
+                return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong!!!");
             }
-            //try
-            //{
-                
-            //}
-            //catch(Exception e)
-            //{
-            //    return BadRequest(e.Message);
-            //}
-            return BadRequest("Something went wrong");
+            catch(Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
 
         }
-        //[HttpPost]
-        //public IActionResult Post([FromForm] PostFile file)
-        //{
-        //    MemoryStream stream = new MemoryStream();
-        //    file.file.CopyTo(stream);
-        //    var content = stream.ToArray();
-        //    return File(content, "image/jpg", "result.jpg");
-        //}
-        [HttpGet]
-        public IActionResult Get()
+        [HttpPost("encrypt_text")]
+        public IActionResult encryptText([FromForm] AES_Text input)
         {
-            Bitmap image = new Bitmap("E:\\Work\\PTIT\\ATPM\\FinalATPM\\test\\apple.jpg");
-            MemoryStream stream = new MemoryStream();
-            image.Save(stream, ImageFormat.Jpeg);
-            var content = stream.ToArray();
-            return File(content, "image/jpg", "result.jpg");
+            try
+            {
+                AES aes = new AES();
+                byte[] resultByte = aes.encrypt(input.message, input.key, input.keySize);
+                string result = Encoding.UTF8.GetString(resultByte);
+                return Ok(result);
+            }
+            catch(Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
         }
+        [HttpPost("decrypt_text")]
+        public IActionResult decryptText([FromForm] AES_Text input)
+        {
+            try
+            {
+                AES aes = new AES();
+                byte[] inputByteMessage = Encoding.UTF8.GetBytes(input.message);
+                string result = aes.decrypt(inputByteMessage, input.key, input.keySize);
+                return Ok(result);
+            }
+            catch(Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+        }
+        [HttpPost("watermark")]
+        public IActionResult watermark([FromForm] PostFile postFile)
+        {
+            try
+            {
+                byte[] messageByte = Encoding.UTF8.GetBytes(postFile.message);
+                if (postFile.fileType.ToLower() == "image")
+                {
+                    using (var stream = new MemoryStream())
+                    {
+                        postFile.file.CopyTo(stream);
+                        Bitmap watermarkedImage = LSB.watermarkImage(stream, messageByte);
+                        MemoryStream saveFile = new MemoryStream();
+                        watermarkedImage.Save(saveFile, ImageFormat.Png);
+                        var content = saveFile.ToArray();
+                        return File(content, "image/png", "watermarked_" + postFile.file.FileName.Split('.')[0] + ".png");
+                    }
+                }
+                else if (postFile.fileType.ToLower() == "audio")
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        postFile.file.CopyTo(memoryStream);
+
+                        byte[] watermarkedAudio = LSB.watermarkAudio(memoryStream, messageByte);
+                        return File(watermarkedAudio, "audio/wav", "watermarked_" + postFile.file.FileName);
+
+                    }
+                }
+                else
+                {
+                    return BadRequest("File format not supported");
+                }
+            }
+            catch(Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+        }
+        [HttpPost("extract")]
+        public IActionResult extract([FromForm] PostFile postFile)
+        {
+            try
+            {
+                if (postFile.fileType.ToLower() == "image")
+                {
+                    using (var stream = new MemoryStream())
+                    {
+                        postFile.file.CopyTo(stream);
+                        byte[] extractedMessage = LSB.extractImage(stream);
+                        return Ok(Encoding.UTF8.GetString(extractedMessage));
+                    }
+                }
+                else if (postFile.fileType.ToLower() == "audio")
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        postFile.file.CopyTo(memoryStream);
+                        byte[] extractedMessage = LSB.extractAudio(memoryStream);
+                        return Ok(Encoding.UTF8.GetString(extractedMessage));
+
+                    }
+                }
+                else
+                {
+                    return BadRequest("File format not supported");
+                }
+            }
+            catch(Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Can not extract message from media \n" + e.Message);
+            }
+        }
+
     }
 }
