@@ -63,7 +63,7 @@ namespace WebApp.Controllers
                     return BadRequest("File format not supported");
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }

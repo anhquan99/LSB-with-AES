@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import MyChart from './MyChart';
 import {
     Form,
     Label,
@@ -18,8 +19,9 @@ import {
     Tooltip,
     Legend
 } from 'chart.js';
-import Chart from 'chart.js/auto';
-Chart.register(
+import axios from "axios";
+import Line from 'chart.js/auto';
+Line.register(
     CategoryScale,
     LinearScale,
     PointElement,
@@ -27,30 +29,8 @@ Chart.register(
     Title,
     Tooltip,
     Legend);
-const state = {
-    labels: ['January', 'February', 'March',
-        'April', 'May'],
-    datasets: [
-        {
-            label: 'Rainfall',
-            fill: false,
-            lineTension: 0.5,
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
-            borderWidth: 2,
-            data: [65, 59, 80, 81, 56]
-        },
-        {
-            label: 'Test',
-            fill: false,
-            lineTension: 0.5,
-            borderColor: 'rgb(53, 162, 235)',
-            backgroundColor: 'rgba(53, 162, 235, 0.5)',
-            borderWidth: 2,
-            data: [35, 40, 10, 51, 0]
-        }
-    ]
-}
+
+
 const options = {
     responsive: true,
     plugins: {
@@ -66,13 +46,40 @@ const options = {
 export class Analyze extends Component {
     state = {
         fileType: "Image",
-        file: [],
-        message: "",
-        keySize: "",
-        key: "",
-        result: "",
-        fileName: ""
+        original: [],
+        watermarked: [],
+        originFileName: "",
+        watermarkedFileName: "",
+        redChartOrigin: [],
+        redChartWater: [],
+        greenChart: "",
+        blueChart: "",
+        audioChart: "",
+        dataStateRed: {}
     };
+    audioRef = React.createRef();
+    isFileImage(file) {
+        return file && file["type"].split("/")[0] === "image";
+    }
+    async handleImageChange(e, source, name) {
+        var origin = e.target.files;
+        if (e.target.files) {
+            for (let i = 0; i < e.target.files.length; i++) {
+                if (!this.isFileImage(e.target.files[i])) {
+                    this.setState({ message: "INVALID IMAGE FILE" });
+                    this.setState({ [source]: [] });
+                    return;
+                }
+            }
+            const filesArray = Array.from(e.target.files).map(file =>
+                URL.createObjectURL(file)
+            );
+
+            await this.setState({ [source]: filesArray });
+            await this.setState({ [name]: origin[0].name });
+
+        }
+    }
     renderPhotos(source, state) {
         return source.map((photo, i) => {
             return (
@@ -94,6 +101,25 @@ export class Analyze extends Component {
             );
         });
     }
+    async handleImageChange(e, source, name) {
+        var origin = e.target.files;
+        if (e.target.files) {
+            for (let i = 0; i < e.target.files.length; i++) {
+                if (!this.isFileImage(e.target.files[i])) {
+                    this.setState({ message: "INVALID IMAGE FILE" });
+                    this.setState({ [source]: [] });
+                    return;
+                }
+            }
+            const filesArray = Array.from(e.target.files).map(file =>
+                URL.createObjectURL(file)
+            );
+
+            await this.setState({ [source]: filesArray });
+            await this.setState({ [name]: origin[0].name });
+
+        }
+    }
     renderAudio(source, state) {
         return source.map((audio) => {
             return (
@@ -104,113 +130,198 @@ export class Analyze extends Component {
             );
         });
     }
+    makeChart(original, watermarked, name) {
+        const dataState = {
+            datasets: [
+                {
+                    label: 'Original' + name,
+                    fill: false,
+                    lineTension: 0.5,
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderWidth: 2,
+                    data: original
+                },
+                {
+                    label: 'Watermarked' + name,
+                    fill: false,
+                    lineTension: 0.5,
+                    borderColor: 'rgb(53, 162, 235)',
+                    backgroundColor: 'rgba(53, 162, 235, 0.5)',
+                    borderWidth: 2,
+                    data: watermarked
+                }
+            ]
+        }
+        return (
+            <Line
+                data={dataState}
+                options={{
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: { name } + 'Chart',
+                        },
+                    },
+                }}
+            />
+        );
+    }
+    async handleAudioChange(e, source, name) {
+        var origin = e.target.files;
+        const filesArray = Array.from(e.target.files).map(file =>
+            URL.createObjectURL(file)
+        );
+        console.log(filesArray);
+        await this.setState({ [source]: filesArray });
+        await this.setState({ [name]: origin[0].name });
+        this.audioRef.current.pause();
+        this.audioRef.current.load();
+    }
+    async handleFormSubmit(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+
+        await axios.post("/api/analyze", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        }).then((response) => {
+            this.setState({ redChartOrigin: response.data[0].original });
+            this.setState({ redChartWater: response.data[0].watermarked });
+            console.log(this.state.redChartOrigin);
+            // this.setState({ dataStateRed: {
+            //     datasets: [
+            //         {
+            //             label: 'Original Red',
+            //             fill: false,
+            //             lineTension: 0.5,
+            //             borderColor: 'rgb(255, 99, 132)',
+            //             backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            //             borderWidth: 2,
+            //             data: response.data[0].original
+            //         },
+            //         {
+            //             label: 'Watermarked red',
+            //             fill: false,
+            //             lineTension: 0.5,
+            //             borderColor: 'rgb(53, 162, 235)',
+            //             backgroundColor: 'rgba(53, 162, 235, 0.5)',
+            //             borderWidth: 2,
+            //             data: response.data[0].watermarked
+            //         }
+            //     ]
+            // }});
+        }).catch((response) => {
+            console.log(response)
+        });
+    }
     render() {
         return (
-            <Form
-                action="/api/AES"
-                className="body"
-                method="POST"
-                // onSubmit={e => this.handleFormSubmit(e)}
-                encType="multipart/form-data"
-            >
-                <h1>ANALYZE FILE</h1>
-                <FormGroup>
-                    <Label for="fileType">File type</Label>
-                    <Input
-                        id="fileType"
-                        name="fileType"
-                        type="select"
-                        required={true}
-                        onChange={e => {
-                            this.setState({ fileType: e.target.value });
-                        }}
-                    >
-                        <option value="Image">Image</option>
-                        <option value="Audio">Audio</option>
-                    </Input>
-                </FormGroup>
-                <Row xs="2">
-                    <Col>
-                        <Label for="file">File</Label>
-                        <div className="custom-file">
-                            <input
-                                type="file"
-                                required={true}
-                                className="custom-file-input"
-                                id="file"
-                                name="file"
-                                accept={this.state.fileType == "Image" ? "image/*" : ".wav"}
-                                onChange={(e) => {
-                                    if (this.state.fileType === "Image") {
-                                        this.handleImageChange(e, "file")
-                                    }
-                                    else {
-                                        this.handleAudioChange(e, "file")
-                                    }
-                                }}
-                                required={true}
-                            />
-                            <label className="custom-file-label" htmlFor="file">
-                                {this.state.fileName === '' ? "Choose file" : this.state.fileName}
-                            </label>
-                        </div>
-                        <FormText>Audio file support only for .wav file.</FormText>
-                    </Col>
-                    <Col>
-                        {this.state.fileType === "Image" ? <div className="full_size">{this.renderPhotos(this.state.file, "file")}</div> :
-                            <div className="full_size">{this.renderAudio(this.state.file, "file")}</div>}
-                    </Col>
-                </Row>
-                <Row xs="2">
-                    <Col>
-                        <Label for="file">File</Label>
-                        <div className="custom-file">
-                            <input
-                                type="file"
-                                required={true}
-                                className="custom-file-input"
-                                id="file"
-                                name="file"
-                                accept={this.state.fileType == "Image" ? "image/*" : ".wav"}
-                                onChange={(e) => {
-                                    if (this.state.fileType === "Image") {
-                                        this.handleImageChange(e, "file")
-                                    }
-                                    else {
-                                        this.handleAudioChange(e, "file")
-                                    }
-                                }}
-                                required={true}
-                            />
-                            <label className="custom-file-label" htmlFor="file">
-                                {this.state.fileName === '' ? "Choose file" : this.state.fileName}
-                            </label>
-                        </div>
-                        <FormText>Audio file support only for .wav file.</FormText>
-                    </Col>
-                    <Col>
-                        {this.state.fileType === "Image" ? <div className="full_size">{this.renderPhotos(this.state.file, "file")}</div> :
-                            <div className="full_size">{this.renderAudio(this.state.file, "file")}</div>}
-                    </Col>
-                </Row>
-                <br></br>
-                <Button color="primary">Submit</Button>
-            </Form>
-            // <Line
-            //     data={state}
-            //     options={{
-            //         responsive: true,
-            //         plugins: {
-            //             legend: {
-            //                 position: 'top',
-            //             },
-            //             title: {
-            //                 display: true,
-            //                 text: 'Chart.js Line Chart',
-            //             },
-            //         },
-            //     }}
-            // />
+            <>
+                <Form
+                    className="body"
+                    method="POST"
+                    encType="multipart/form-data"
+                    onSubmit={e => this.handleFormSubmit(e)}
+                >
+                    <h1>ANALYZE FILE</h1>
+                    <FormGroup>
+                        <Label for="fileType">File type</Label>
+                        <Input
+                            id="fileType"
+                            name="fileType"
+                            type="select"
+                            required={true}
+                            onChange={e => {
+                                this.setState({ fileType: e.target.value });
+                            }}
+                        >
+                            <option value="Image">Image</option>
+                            <option value="Audio">Audio</option>
+                        </Input>
+                    </FormGroup>
+                    <Row xs="2">
+                        <Col>
+                            <Label for="file">Original</Label>
+                            <div className="custom-file">
+                                <input
+                                    type="file"
+                                    required={true}
+                                    className="custom-file-input"
+                                    id="file"
+                                    name="original"
+                                    accept={this.state.fileType == "Image" ? "image/*" : ".wav"}
+                                    onChange={(e) => {
+                                        if (this.state.fileType === "Image") {
+                                            this.handleImageChange(e, "original", "originFileName")
+                                        }
+                                        else {
+                                            this.handleAudioChange(e, "original", "originFileName")
+                                        }
+                                    }}
+                                    required={true}
+                                />
+                                <label className="custom-file-label" htmlFor="file">
+                                    {this.state.originFileName === '' ? "Choose file" : this.state.originFileName}
+                                </label>
+                            </div>
+                            <FormText>Audio file support only for .wav file.</FormText>
+                        </Col>
+                        <Col>
+                            {this.state.fileType === "Image" ? <div className="full_size">{this.renderPhotos(this.state.original, "original")}</div> :
+                                <div className="full_size">{this.renderAudio(this.state.original, "original")}</div>}
+                        </Col>
+                    </Row>
+                    <br />
+                    <br />
+                    <Row xs="2">
+                        <Col>
+                            <Label for="file">Watermarked</Label>
+                            <div className="custom-file">
+                                <input
+                                    type="file"
+                                    required={true}
+                                    className="custom-file-input"
+                                    id="file"
+                                    name="watermarked"
+                                    accept={this.state.fileType == "Image" ? "image/*" : ".wav"}
+                                    onChange={(e) => {
+                                        if (this.state.fileType === "Image") {
+                                            this.handleImageChange(e, "watermarked", "watermarkedFileName")
+                                        }
+                                        else {
+                                            this.handleAudioChange(e, "watermarked", "watermarkedFileName")
+                                        }
+                                    }}
+                                    required={true}
+                                />
+                                <label className="custom-file-label" htmlFor="file">
+                                    {this.state.watermarkedFileName === '' ? "Choose file" : this.state.watermarkedFileName}
+                                </label>
+                            </div>
+                            <FormText>Audio file support only for .wav file.</FormText>
+                        </Col>
+                        <Col>
+                            {this.state.fileType === "Image" ? <div className="full_size">{this.renderPhotos(this.state.watermarked, "watermarked")}</div> :
+                                <div className="full_size">{this.renderAudio(this.state.watermarked, "watermarked")}</div>}
+                        </Col>
+                    </Row>
+                    <br></br>
+                    <Button color="primary">Submit</Button>
+                </Form>
+                {this.state.redChartOrigin.length != 0 && this.state.redChartWater.length != 0 ?
+                    <MyChart original={this.state.redChartOrigin} watermarked={this.state.redChartWater} name="Red" chartName="Red "></MyChart> : ""}
+                {/* <div>{this.state.greenChart}</div>
+                <div>{this.state.blueChart}</div>
+                <div>{this.state.audioChart}<div> */}
+                
+            </>
+
 
         );
     }

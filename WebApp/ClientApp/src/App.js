@@ -5,6 +5,7 @@ import { Index } from './components/Index';
 import { AES } from './components/AES';
 import { LSB } from './components/LSB';
 import { Analyze } from './components/Analyze';
+// import { MyChart } from './components/MyChart';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './custom.css'
@@ -12,13 +13,14 @@ import './custom.css'
 export default class App extends Component {
   static displayName = App.name;
 
-  render () {
+  render() {
     return (
       <Layout>
         <Route exact path='/' component={Index} />
         <Route exact path='/AES' component={AES} />
         <Route exact path='/LSB' component={LSB} />
         <Route exact path='/analyze' component={Analyze} />
+        {/* <Route exact path='/test' component={MyChart} /> */}
       </Layout>
     );
   }

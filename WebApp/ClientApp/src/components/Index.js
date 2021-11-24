@@ -77,13 +77,14 @@ export class Index extends Component {
     }
   }
   async handleAudioChange(e, source) {
+    var origin = e.target.files;
     const filesArray = Array.from(e.target.files).map(file =>
       URL.createObjectURL(file)
     );
     await this.setState({ [source]: filesArray });
     this.audioRef.current.pause();
     this.audioRef.current.load();
-    await this.setState({ fileName: filesArray[0].name });
+    await this.setState({ fileName: origin[0].name });
   }
   render() {
     return (
@@ -91,7 +92,6 @@ export class Index extends Component {
         action="/api/AES"
         className="body"
         method="POST"
-        // onSubmit={e => this.handleFormSubmit(e)}
         encType="multipart/form-data"
       >
         <h1>LSB WITH AES ENCRYPT/DECRYPT</h1>

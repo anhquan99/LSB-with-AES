@@ -25,9 +25,20 @@ export class AES extends Component {
     async handleFormSubmit(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
-        await axios.post("/api/AES/encrypt_text", formData).then((response) => {
-            this.setState({ result: response.data });
-        });
+        if(this.state.action.toLowerCase() === "encrypt"){
+            await axios.post("/api/AES/encrypt_text", formData).then((response) => {
+                this.setState({ result: response.data });
+            }).catch((response) => {
+                alert(response);
+            });
+        }
+        else{
+            await axios.post("/api/AES/decrypt_text", formData).then((response) => {
+                this.setState({ result: response.data });
+            }).catch((response) => {
+                alert(response);
+            });
+        }
     }
     render() {
         return (
@@ -79,7 +90,7 @@ export class AES extends Component {
                         <Row>
                             <Col xs="11">
                                 <CardTitle tag="h5">
-                                    RESULT
+                                    Result {this.state.action}
                                 </CardTitle>
                             </Col>
                             <Col xs="1">
