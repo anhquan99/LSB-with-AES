@@ -29,10 +29,7 @@ namespace WebApp.Models
                 dataSize = watermarked.Count;
                 dataLeap = watermarked.Count / 100;
             }
-            for(int i = 0; i < dataLeap; i++)
-            {
-                label.Add(i + 1);
-            }
+
             int index = 0;
             int avgOrigin = 0;
             int avgWater = 0;
@@ -53,6 +50,10 @@ namespace WebApp.Models
                 avgOrigin += original[i];
                 avgWater += watermarked[i];
                 index++;
+            }
+            for (int i = 0; i < this.original.Count; i++)
+            {
+                label.Add(i + 1);
             }
         }
     }
