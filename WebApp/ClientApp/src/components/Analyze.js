@@ -50,14 +50,26 @@ export class Analyze extends Component {
         watermarked: [],
         originFileName: "",
         watermarkedFileName: "",
+
         redChartOrigin: [],
         redChartWater: [],
-        greenChart: "",
-        blueChart: "",
-        audioChart: "",
-        dataStateRed: {}
+        redChartLabel: [],
+
+        greenChartOrigin: [],
+        greenChartWater: [],
+        greenChartLabel: [],
+
+        blueChartOrigin: [],
+        blueChartWater: [],
+        blueChartLabel: [],
+
+        audioChartOrigin: [],
+        audioChartWater: [],
+        audioChartLabel: [],
+
     };
-    audioRef = React.createRef();
+    audioOriginalRef = React.createRef();
+    audioWatermarkRef = React.createRef();
     isFileImage(file) {
         return file && file["type"].split("/")[0] === "image";
     }
@@ -76,7 +88,12 @@ export class Analyze extends Component {
             );
 
             await this.setState({ [source]: filesArray });
-            await this.setState({ [name]: origin[0].name });
+            if (origin[0]?.name) {
+                await this.setState({ [name]: origin[0].name });
+            }
+            else {
+                await this.setState({ [name]: "" });
+            }
 
         }
     }
@@ -86,7 +103,6 @@ export class Analyze extends Component {
                 <div
                     id={i}
                     key={photo}
-                    ref={this.setRef}
                     style={{
                         border: "1px solid rgb(222, 222, 222)",
                         height: "250px",
@@ -116,19 +132,36 @@ export class Analyze extends Component {
             );
 
             await this.setState({ [source]: filesArray });
-            await this.setState({ [name]: origin[0].name });
-
+            if (origin[0]?.name) {
+                await this.setState({ [name]: origin[0].name });
+            }
+            else {
+                await this.setState({ [name]: "" });
+            }
         }
     }
-    renderAudio(source, state) {
-        return source.map((audio) => {
-            return (
-                <audio ref={this.audioRef} controls className="full_sizeAudio">
-                    <source src={audio} type="audio/ogg" />
-                    <source src={audio} type="audio/mpeg" />
-                </audio>
-            );
-        });
+    renderAudio(source, name) {
+
+        if (name.toLowerCase() === "original") {
+            return source.map((audio) => {
+                return (
+                    <audio ref={this.audioOriginalRef} controls className="full_sizeAudio">
+                        <source src={audio} type="audio/ogg" />
+                        <source src={audio} type="audio/mpeg" />
+                    </audio>
+                );
+            });
+        }
+        else {
+            return source.map((audio) => {
+                return (
+                    <audio ref={this.audioWatermarkRef} controls className="full_sizeAudio">
+                        <source src={audio} type="audio/ogg" />
+                        <source src={audio} type="audio/mpeg" />
+                    </audio>
+                );
+            });
+        }
     }
     makeChart(original, watermarked, name) {
         const dataState = {
@@ -176,49 +209,71 @@ export class Analyze extends Component {
         const filesArray = Array.from(e.target.files).map(file =>
             URL.createObjectURL(file)
         );
-        console.log(filesArray);
         await this.setState({ [source]: filesArray });
-        await this.setState({ [name]: origin[0].name });
-        this.audioRef.current.pause();
-        this.audioRef.current.load();
+        if (origin[0]?.name) {
+            await this.setState({ [name]: origin[0].name });
+            if (source.toLowerCase() === "original") {
+                this.audioOriginalRef.current.pause();
+                this.audioOriginalRef.current.load();
+            }
+            else {
+                this.audioWatermarkRef.current.pause();
+                this.audioWatermarkRef.current.load();
+            }
+
+        }
+        else {
+            await this.setState({ [name]: "" });
+        }
+
     }
     async handleFormSubmit(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
-
         await axios.post("/api/analyze", formData, {
             headers: {
                 "Content-Type": "multipart/form-data"
             }
         }).then((response) => {
-            this.setState({ redChartOrigin: response.data[0].original });
-            this.setState({ redChartWater: response.data[0].watermarked });
-            console.log(this.state.redChartOrigin);
-            // this.setState({ dataStateRed: {
-            //     datasets: [
-            //         {
-            //             label: 'Original Red',
-            //             fill: false,
-            //             lineTension: 0.5,
-            //             borderColor: 'rgb(255, 99, 132)',
-            //             backgroundColor: 'rgba(255, 99, 132, 0.5)',
-            //             borderWidth: 2,
-            //             data: response.data[0].original
-            //         },
-            //         {
-            //             label: 'Watermarked red',
-            //             fill: false,
-            //             lineTension: 0.5,
-            //             borderColor: 'rgb(53, 162, 235)',
-            //             backgroundColor: 'rgba(53, 162, 235, 0.5)',
-            //             borderWidth: 2,
-            //             data: response.data[0].watermarked
-            //         }
-            //     ]
-            // }});
+            if (this.state.fileType.toLowerCase() === "image") {
+                this.setState({ redChartOrigin: response.data[0].original });
+                this.setState({ redChartWater: response.data[0].watermarked });
+                this.setState({ redChartLabel: response.data[0].label });
+
+                this.setState({ greenChartOrigin: response.data[1].original });
+                this.setState({ greenChartWater: response.data[1].watermarked });
+                this.setState({ greenChartLabel: response.data[1].label });
+
+                this.setState({ blueChartOrigin: response.data[2].original });
+                this.setState({ blueChartWater: response.data[2].watermarked });
+                this.setState({ blueChartLabel: response.data[2].label });
+
+            }
+            else {
+                this.setState({ audioChartOrigin: response.data.original });
+                this.setState({ audioChartWater: response.data.watermarked });
+                this.setState({ audioChartLabel: response.data.label });
+            }
         }).catch((response) => {
             console.log(response)
         });
+    }
+    clearChart() {
+        this.setState({ redChartOrigin: [] });
+        this.setState({ redChartWater: [] });
+        this.setState({ redChartLabel: [] });
+
+        this.setState({ greenChartOrigin: [] });
+        this.setState({ greenChartWater: [] });
+        this.setState({ greenChartLabel: [] });
+
+        this.setState({ blueChartOrigin: [] });
+        this.setState({ blueChartWater: [] });
+        this.setState({ blueChartLabel: [] });
+
+        this.setState({ audioChartOrigin: [] });
+        this.setState({ audioChartWater: [] });
+        this.setState({ audioChartLabel: [] });
     }
     render() {
         return (
@@ -312,14 +367,42 @@ export class Analyze extends Component {
                         </Col>
                     </Row>
                     <br></br>
-                    <Button color="primary">Submit</Button>
+                    <Row xs="4">
+                        <Button color="primary">Submit</Button>
+                        <Col></Col>
+                        <Col></Col>
+                        <Button onClick={() => this.clearChart()} color="danger">Clear</Button>
+                    </Row>
+
                 </Form>
                 {this.state.redChartOrigin.length != 0 && this.state.redChartWater.length != 0 ?
-                    <MyChart original={this.state.redChartOrigin} watermarked={this.state.redChartWater} name="Red" chartName="Red "></MyChart> : ""}
-                {/* <div>{this.state.greenChart}</div>
-                <div>{this.state.blueChart}</div>
-                <div>{this.state.audioChart}<div> */}
-                
+                    <div>
+                        <h1>Red pixel</h1>
+                        <MyChart original={this.state.redChartOrigin} watermarked={this.state.redChartWater} label={this.state.redChartLabel} name="Red" chartName="Red "></MyChart>
+                    </div>
+                    : ""}
+
+                {this.state.greenChartOrigin.length != 0 && this.state.greenChartWater.length != 0 ?
+                    <div>
+                        <h1>Green pixel</h1>
+                        <MyChart original={this.state.greenChartOrigin} watermarked={this.state.greenChartWater} label={this.state.greenChartLabel} name="Green " chartName="Green "></MyChart>
+                    </div>
+                    : ""}
+
+                {this.state.blueChartOrigin.length != 0 && this.state.blueChartWater.length != 0 ?
+                    <div>
+                        <h1>Blue pixel</h1>
+                        <MyChart original={this.state.blueChartOrigin} watermarked={this.state.blueChartWater} label={this.state.blueChartLabel} name="Blue" chartName="Blue"></MyChart>
+                    </div>
+                    : ""}
+
+                {this.state.audioChartOrigin.length != 0 && this.state.audioChartWater.length != 0 ?
+                    <div>
+                        <h1>Audio data bytes</h1>
+                        <MyChart original={this.state.audioChartOrigin} watermarked={this.state.audioChartWater} label={this.state.audioChartLabel} name="audio" chartName="Audio"></MyChart>
+                    </div>
+                    : ""}
+
             </>
 
 

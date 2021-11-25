@@ -19,58 +19,15 @@ const state = {
 }
 
 export default class MyChart extends React.Component {
-    state = {
-        emptyLabels: [],
-        length: 0,
-        data: {},
-    }
     constructor(props) {
         super(props);
-        console.log(this.props.original);
-        console.log(this.props.watermarked);
-        // if (props.original < props.watermarked) {
-        //     this.setState({length : props.original.length});
-        // }
-        // else {
-        //     this.setState({length : props.watermarked.length});
-        // }
-        // var tempLabels = [];
-        // for (var i = 0; i < this.length; i++) {
-        //     tempLabels.push("");
-        // }
-        // this.setState({emptyLabels : tempLabels });
-
-        // this.setState({data : dataSet});
     }
-    // dataSet = {
-    //     labels: ["","","",""],
-    //     datasets: [
-    //         {
-    //             label: 'Original ' + this.props.name,
-    //             fill: false,
-    //             lineTension: 0.5,
-    //             borderColor: 'rgb(255, 99, 132)',
-    //             backgroundColor: 'rgba(255, 99, 132, 0.5)',
-    //             borderWidth: 2,
-    //             data: [6,7,8,9,10]
-    //         },
-    //         {
-    //             label: 'Watermarked ' + this.props.name,
-    //             fill: false,
-    //             lineTension: 0.5,
-    //             borderColor: 'rgb(53, 162, 235)',
-    //             backgroundColor: 'rgba(53, 162, 235, 0.5)',
-    //             borderWidth: 2,
-    //             data: [1,2,3,4,5]
-    //         }
-    //     ]
-    // }
     render() {
         return (
             <div>
                 <Line
                     data={{
-                        labels: ["", "", "", ""],
+                        labels: this.props.label,
                         datasets: [
                             {
                                 label: 'Original ' + this.props.name,
@@ -79,7 +36,7 @@ export default class MyChart extends React.Component {
                                 borderColor: 'rgb(255, 99, 132)',
                                 backgroundColor: 'rgba(255, 99, 132, 0.5)',
                                 borderWidth: 2,
-                                data: this.props.watermarked
+                                data: this.props.original
                             },
                             {
                                 label: 'Watermarked ' + this.props.name,
@@ -88,7 +45,7 @@ export default class MyChart extends React.Component {
                                 borderColor: 'rgb(53, 162, 235)',
                                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
                                 borderWidth: 2,
-                                data: this.props.original
+                                data: this.props.watermarked
                             }]
                     }}
                     options={{

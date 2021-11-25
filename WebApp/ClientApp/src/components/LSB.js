@@ -67,7 +67,13 @@ export class LSB extends Component {
       );
 
       await this.setState({ [source]: filesArray });
-      await this.setState({ fileName: origin[0].name });
+      if (origin[0]?.name) {
+        await this.setState({ fileName: origin[0].name });
+      }
+      else {
+        await this.setState({ fileName: "" });
+      }
+
 
     }
   }
@@ -78,9 +84,16 @@ export class LSB extends Component {
     );
     console.log(filesArray);
     await this.setState({ [source]: filesArray });
-    await this.setState({ fileName: origin[0].name });
-    this.audioRef.current.pause();
-    this.audioRef.current.load();
+    if (origin[0]?.name) {
+      await this.setState({ fileName: origin[0].name });
+      this.audioRef.current.pause();
+      this.audioRef.current.load();
+    }
+    else {
+      await this.setState({ fileName: "" });
+    }
+
+
   }
   render() {
     return (
