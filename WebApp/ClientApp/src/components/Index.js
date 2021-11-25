@@ -69,10 +69,13 @@ export class Index extends Component {
       );
 
       await this.setState({ [source]: filesArray });
-      // Array.from(e.target.files).map(file => {
-      //   URL.revokeObjectURL(file);
-      // });
-      await this.setState({ fileName: origin[0].name });
+      await this.setState({ [source]: filesArray });
+      if (origin[0]?.name) {
+        await this.setState({ fileName: origin[0].name });
+      }
+      else {
+        await this.setState({ fileName: "" });
+      }
 
     }
   }
@@ -82,9 +85,14 @@ export class Index extends Component {
       URL.createObjectURL(file)
     );
     await this.setState({ [source]: filesArray });
-    this.audioRef.current.pause();
-    this.audioRef.current.load();
-    await this.setState({ fileName: origin[0].name });
+    if (origin[0]?.name) {
+      await this.setState({ fileName: origin[0].name });
+      this.audioRef.current.pause();
+      this.audioRef.current.load();
+    }
+    else {
+      await this.setState({ fileName: "" });
+    }
   }
   render() {
     return (

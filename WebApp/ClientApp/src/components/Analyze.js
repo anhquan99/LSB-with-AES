@@ -67,6 +67,8 @@ export class Analyze extends Component {
         audioChartWater: [],
         audioChartLabel: [],
 
+        flag: false
+
     };
     audioOriginalRef = React.createRef();
     audioWatermarkRef = React.createRef();
@@ -254,8 +256,10 @@ export class Analyze extends Component {
                 this.setState({ audioChartWater: response.data.watermarked });
                 this.setState({ audioChartLabel: response.data.label });
             }
+            this.setState({ flag: true });
         }).catch((response) => {
-            console.log(response)
+            console.log(response);
+            this.setState({ flag: false });
         });
     }
     clearChart() {
@@ -274,6 +278,8 @@ export class Analyze extends Component {
         this.setState({ audioChartOrigin: [] });
         this.setState({ audioChartWater: [] });
         this.setState({ audioChartLabel: [] });
+        
+        this.setState({flag: false});
     }
     render() {
         return (
@@ -371,7 +377,9 @@ export class Analyze extends Component {
                         <Button color="primary">Submit</Button>
                         <Col></Col>
                         <Col></Col>
-                        <Button onClick={() => this.clearChart()} color="danger">Clear</Button>
+                        {this.state.flag === true ?
+                            <Button onClick={() => this.clearChart()} color="danger">Clear</Button> : <Col/>
+                        }
                     </Row>
 
                 </Form>
