@@ -24,17 +24,7 @@ namespace Utility
         }
         public List<int> redBytes { get; private set; }
         public List<int> greenBytes { get; private set; }
-        public List<int> blueBytes { get; private set; }
-        //public ImageHandler(string path, int messageBits)
-        //{
-        //    this.image = new Bitmap(path);
-        //    this.LSBBit = image.Width * image.Height * 3;
-        //    this.numberOfBitNeedToReplace = messageBits;
-        //    if (numberOfBitNeedToReplace < LSBBit)
-        //    {
-        //        countLastPixelBit();
-        //    }
-        //}        
+        public List<int> blueBytes { get; private set; }     
         public ImageHandler(MemoryStream stream, int messageBits)
         {
             this.image = new Bitmap(stream);
@@ -175,10 +165,6 @@ namespace Utility
                     else this.lastZeroBit++;
                 }
             }
-        }
-        public static int getGrayPixel(int red, int blue, int green)
-        {
-            return (red + blue + green) / 3;
         }
         private string subLastByte(int index, string imageBits, string messageBits)
         {

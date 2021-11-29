@@ -33,7 +33,7 @@ namespace WebApp
                 c.SwaggerDoc("v1",
                     new OpenApiInfo
                     {
-                        Title = "IdentityServer.Demo.Api",
+                        Title = "AES LSB Webapp",
                         Version = "v1",
                     });
             });

@@ -8,7 +8,8 @@ import {
     FormText,
     Button,
     Col,
-    Row
+    Row,
+    Spinner
 } from "reactstrap";
 import {
     CategoryScale,
@@ -67,7 +68,7 @@ export class Analyze extends Component {
         audioChartWater: [],
         audioChartLabel: [],
 
-        flag: false
+        isSubmit: false
 
     };
     audioOriginalRef = React.createRef();
@@ -229,7 +230,28 @@ export class Analyze extends Component {
         }
 
     }
+    clearChart() {
+        this.setState({ redChartOrigin: [] });
+        this.setState({ redChartWater: [] });
+        this.setState({ redChartLabel: [] });
+
+        this.setState({ greenChartOrigin: [] });
+        this.setState({ greenChartWater: [] });
+        this.setState({ greenChartLabel: [] });
+
+        this.setState({ blueChartOrigin: [] });
+        this.setState({ blueChartWater: [] });
+        this.setState({ blueChartLabel: [] });
+
+        this.setState({ audioChartOrigin: [] });
+        this.setState({ audioChartWater: [] });
+        this.setState({ audioChartLabel: [] });
+
+        this.setState({ flag: false });
+    }
     async handleFormSubmit(e) {
+        this.setState({ isSubmit: true });
+        this.clearChart();
         e.preventDefault();
         const formData = new FormData(e.target);
         await axios.post("/api/analyze", formData, {
@@ -256,31 +278,13 @@ export class Analyze extends Component {
                 this.setState({ audioChartWater: response.data.watermarked });
                 this.setState({ audioChartLabel: response.data.label });
             }
-            this.setState({ flag: true });
         }).catch((response) => {
             console.log(response);
             this.setState({ flag: false });
         });
+        this.setState({ isSubmit: false })
     }
-    clearChart() {
-        this.setState({ redChartOrigin: [] });
-        this.setState({ redChartWater: [] });
-        this.setState({ redChartLabel: [] });
 
-        this.setState({ greenChartOrigin: [] });
-        this.setState({ greenChartWater: [] });
-        this.setState({ greenChartLabel: [] });
-
-        this.setState({ blueChartOrigin: [] });
-        this.setState({ blueChartWater: [] });
-        this.setState({ blueChartLabel: [] });
-
-        this.setState({ audioChartOrigin: [] });
-        this.setState({ audioChartWater: [] });
-        this.setState({ audioChartLabel: [] });
-        
-        this.setState({flag: false});
-    }
     render() {
         return (
             <>
@@ -374,12 +378,15 @@ export class Analyze extends Component {
                     </Row>
                     <br></br>
                     <Row xs="4">
-                        <Button color="primary">Submit</Button>
+                        <Col>
+                            {this.state.isSubmit === true ? <Col><Spinner animation="border" /></Col> : <Button color="primary">Submit</Button>}
+                        </Col>
                         <Col></Col>
                         <Col></Col>
-                        {this.state.flag === true ?
+                        <Col></Col>
+                        {/* {this.state.flag === true ?
                             <Button onClick={() => this.clearChart()} color="danger">Clear</Button> : <Col/>
-                        }
+                        } */}
                     </Row>
 
                 </Form>

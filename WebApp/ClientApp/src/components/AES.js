@@ -10,35 +10,39 @@ import {
     CardText,
     CardTitle,
     Row,
-    Col
+    Col,
+    Spinner
 } from "reactstrap";
 import axios from "axios";
 export class AES extends Component {
     state = {
         result: "",
-        action: "Encrypt"
+        action: "Encrypt",
+        isSubmit: false
     }
     copyToClipBoard() {
         navigator.clipboard.writeText(this.state.result);
         alert("Copied text to clipboard");
     }
     async handleFormSubmit(e) {
+        this.setState({ isSubmit: true })
         e.preventDefault();
         const formData = new FormData(e.target);
-        if(this.state.action.toLowerCase() === "encrypt"){
+        if (this.state.action.toLowerCase() === "encrypt") {
             await axios.post("/api/AES/encrypt_text", formData).then((response) => {
                 this.setState({ result: response.data });
             }).catch((response) => {
                 alert(response);
             });
         }
-        else{
+        else {
             await axios.post("/api/AES/decrypt_text", formData).then((response) => {
                 this.setState({ result: response.data });
             }).catch((response) => {
                 alert(response);
             });
         }
+        this.setState({ isSubmit: false })
     }
     render() {
         return (
@@ -64,6 +68,15 @@ export class AES extends Component {
                         <Label for="message">Message</Label>
                         <Input id="message" name="message" type="textarea" />
                     </FormGroup>
+                    <FormGroup
+                        check
+                        inline
+                    >
+                        <Input id="isByte" name="isByte" type="checkbox" />
+                        <Label check>
+                            Is byte?
+                        </Label>
+                    </FormGroup>
                     <FormGroup>
                         <Label for="keySize">Key size (bit)</Label>
                         <Input id="keySize" name="keySize" type="select" required={true}>
@@ -81,7 +94,7 @@ export class AES extends Component {
                             <option value="Decrypt">Decrypt</option>
                         </Input>
                     </FormGroup>
-                    <Button id="submit" color="primary">Submit</Button>
+                    {this.state.isSubmit === true ? <Col><Spinner animation="border" /></Col> : <Button color="primary">Submit</Button>}
                 </Form>
                 {/* {this.state.result !== "" ? <div>RESULT: {this.state.result}</div> : ""} */}
                 {this.state.result !== "" ?
@@ -100,7 +113,7 @@ export class AES extends Component {
                             </Col>
 
                         </Row>
-                        <br/>
+                        <br />
                         <Alert
                             color="success"
                         >

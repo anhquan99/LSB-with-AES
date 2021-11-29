@@ -127,50 +127,6 @@ namespace Algorithm
             }
             return messageByte.ToArray();
         }
-        //public static string watermarkAudio(string path, byte[] byteMessage)
-        //{
-        //    MessageHandler messageHandler = new MessageHandler(byteMessage);
-        //    AudioWavHandler audioHandler = new AudioWavHandler(path);
-        //    if (audioHandler.bitsAvailable + 1 < messageHandler.toltalBits) return "Audio too small to watermark!!!";
-
-        //    List<byte> data = new List<byte>();
-        //    foreach (var i in audioHandler.header)
-        //    {
-        //        data.Add(i);
-        //    }
-        //    int indexMessage = 0;
-        //    int indexMessageChar = 0;
-        //    int audioIndex = 0;
-        //    string currentMessageStr = new string('0', 8 - messageHandler.strByteMessage[indexMessage].Length) + messageHandler.strByteMessage[indexMessage];
-        //    while (indexMessage < messageHandler.strByteMessage.Length)
-        //    {
-        //        byte currentByte = audioHandler.data[audioIndex];
-        //        char[] currentByteChar = (new string('0', 8 - Convert.ToString(currentByte, 2).Length) + Convert.ToString(currentByte, 2)).ToCharArray();
-        //        currentByteChar[currentByteChar.Length - 2] = currentMessageStr[indexMessageChar];
-        //        indexMessageChar++;
-        //        audioIndex++;
-        //        byte temp = Convert.ToByte(new string(currentByteChar), 2);
-        //        data.Add(Convert.ToByte(new string(currentByteChar), 2));
-        //        if (indexMessageChar == 8)
-        //        {
-        //            indexMessageChar = 0;
-        //            indexMessage++;
-        //            if (indexMessage == messageHandler.strByteMessage.Length) break;
-        //            currentMessageStr = new string('0', 8 - messageHandler.strByteMessage[indexMessage].Length) + messageHandler.strByteMessage[indexMessage];
-        //        }
-        //    }
-        //    for (int i = audioIndex; i < audioHandler.data.Count; i++)
-        //    {
-        //        data.Add(audioHandler.data[i]);
-        //    }
-        //    using (FileStream bytesToAudio = File.Create("resultAudio.wav"))
-        //    {
-        //        bytesToAudio.Write(data.ToArray(), 0, data.Count);
-        //        Stream audioFile = bytesToAudio;
-        //        bytesToAudio.Close();
-        //    }
-        //    return "Sucess";
-        //}
         private static char getFlipBit(char bit)
         {
             if (bit == '0') return '1';
