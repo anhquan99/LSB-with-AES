@@ -100,7 +100,8 @@ namespace WebApp.Controllers
             {
                 AES aes = new AES();
                 byte[] resultByte = aes.encrypt(input.message, input.key, input.keySize);
-                string result = Encoding.UTF8.GetString(resultByte);
+                string resultString = Encoding.UTF8.GetString(resultByte);
+                var result = new EncryptTextResult(resultString, resultByte);
                 return Ok(result);
             }
             catch (Exception e)
@@ -114,7 +115,22 @@ namespace WebApp.Controllers
             try
             {
                 AES aes = new AES();
-                byte[] inputByteMessage = Encoding.UTF8.GetBytes(input.message);
+                byte[] inputByteMessage;
+                if (input.isByte == "on")
+                {
+                    input.message = input.message.Replace(",", "");
+                    var messageByteArr = input.message.Split(' ');
+                    List<byte> messageByteList = new List<byte>();
+                    foreach(var i in messageByteArr)
+                    {
+                        messageByteList.Add((byte)int.Parse(i));
+                    }
+                    inputByteMessage = messageByteList.ToArray();
+                }
+                else
+                {
+                    inputByteMessage = Encoding.UTF8.GetBytes(input.message);
+                }
                 string result = aes.decrypt(inputByteMessage, input.key, input.keySize);
                 return Ok(result);
             }

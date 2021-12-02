@@ -17,20 +17,30 @@ import axios from "axios";
 export class AES extends Component {
     state = {
         result: "",
+        resultByte: "",
         action: "Encrypt",
         isSubmit: false
     }
-    copyToClipBoard() {
-        navigator.clipboard.writeText(this.state.result);
+    copyToClipBoard(type) {
+        if (type === 'resultString') {
+            navigator.clipboard.writeText(this.state.result);
+        }
+        else {
+            navigator.clipboard.writeText(this.state.resultByte);
+        }
         alert("Copied text to clipboard");
     }
     async handleFormSubmit(e) {
+        this.setState({ result: "" });
+        this.setState({ resultByte: "" });
         this.setState({ isSubmit: true })
         e.preventDefault();
         const formData = new FormData(e.target);
         if (this.state.action.toLowerCase() === "encrypt") {
             await axios.post("/api/AES/encrypt_text", formData).then((response) => {
-                this.setState({ result: response.data });
+                console.log(response);
+                this.parseArr(response.data.resultByte);
+                this.setState({ result: response.data.resultString });
             }).catch((response) => {
                 alert(response);
             });
@@ -43,6 +53,15 @@ export class AES extends Component {
             });
         }
         this.setState({ isSubmit: false })
+    }
+    parseArr(arr) {
+        var result = "";
+        arr.forEach(element => {
+            result += element + ", ";
+        });
+        result = result.trim();
+        result = result.substring(0, result.length - 1);
+        this.setState({ resultByte: result });
     }
     render() {
         return (
@@ -98,28 +117,37 @@ export class AES extends Component {
                 </Form>
                 {/* {this.state.result !== "" ? <div>RESULT: {this.state.result}</div> : ""} */}
                 {this.state.result !== "" ?
-
-                    <Card body>
-                        <Row>
-                            <Col xs="11">
+                    <div>
+                        <Card body>
+                            <CardTitle tag="h5">
+                                Result string {this.state.action}
+                            </CardTitle>
+                            <Alert
+                                color="success"
+                            >
+                                {this.state.result}
+                            </Alert>
+                            <Button id="copy" outline color="primary" onClick={() => this.copyToClipBoard("resultString")} >
+                                Copy string
+                            </Button>
+                        </Card>
+                        <br/>
+                        {this.state.resultByte !== "" ?
+                            <Card body>
                                 <CardTitle tag="h5">
-                                    Result {this.state.action}
+                                    Result byte {this.state.action}
                                 </CardTitle>
-                            </Col>
-                            <Col xs="1">
-                                <Button id="copy" outline color="primary" onClick={() => this.copyToClipBoard()} >
-                                    Copy
+                                <Alert
+                                    color="success"
+                                >
+                                    {this.state.resultByte}
+                                </Alert>
+                                <Button id="copy" outline color="primary" onClick={() => this.copyToClipBoard("resultByte")} >
+                                    Copy bytes
                                 </Button>
-                            </Col>
-
-                        </Row>
-                        <br />
-                        <Alert
-                            color="success"
-                        >
-                            {this.state.result}
-                        </Alert>
-                    </Card> : ""}
+                            </Card> : ""}
+                    </div>
+                    : ""}
             </div>
         );
     }

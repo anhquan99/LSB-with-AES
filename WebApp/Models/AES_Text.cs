@@ -10,5 +10,6 @@ namespace WebApp.Models
         public string message { get; set; }
         public string key { get; set; } 
         public int keySize { get; set; }
+        public string isByte { get; set; }
     }
 }
