@@ -132,7 +132,7 @@ namespace WebApp.Controllers
                     inputByteMessage = Encoding.UTF8.GetBytes(input.message);
                 }
                 string result = aes.decrypt(inputByteMessage, input.key, input.keySize);
-                return Ok(result);
+                    return Ok(result);
             }
             catch (Exception e)
             {
