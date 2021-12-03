@@ -5,6 +5,14 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
+RUN apt-get -qq update && apt-get -qqy --no-install-recommends install wget gnupg \
+    git \
+    unzip
+
+RUN curl -sL https://deb.nodesource.com/setup_6.x |  bash -
+RUN apt-get install -y nodejs
+RUN apt-get install -y npm
+
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
 COPY ["WebApp/WebApp.csproj", "WebApp/"]
