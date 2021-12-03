@@ -32,7 +32,7 @@ namespace WebApp.Controllers
 
                     result.Add(new AnalyzeByte(original.redBytes, watermarked.redBytes));
                     result.Add(new AnalyzeByte(original.greenBytes, watermarked.greenBytes));
-                    result.Add(new AnalyzeByte(original.blueBytes, watermarked.greenBytes));
+                    result.Add(new AnalyzeByte(original.blueBytes, watermarked.blueBytes));
                     return Ok(result);
                 }
                 else if (model.fileType.ToLower() == "audio")

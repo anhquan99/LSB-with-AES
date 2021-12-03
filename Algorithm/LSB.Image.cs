@@ -96,7 +96,7 @@ namespace Algorithm
                                 //green
                                 case 1:
                                     byteGreen = Convert.ToString(pixel.G, 2);
-                                    messageLengthByte[messageLengthIndex] = getCharWithFlag(flag, byteRed[byteRed.Length - 1]);
+                                    messageLengthByte[messageLengthIndex] = getCharWithFlag(flag, byteGreen[byteRed.Length - 1]);
 
                                     break;
                                 //blue
